@@ -62,7 +62,7 @@ Rule of thumb: if Copilot's responses feel generic or it starts ignoring your ru
 ## Quick Start
 
 1. Open this workspace alongside your target project in VS Code
-2. Copy [`.github/copilot-instructions.md`](.github/copilot-instructions.md) to your project — adapt the routing and tech stack sections
+2. **Generate a `copilot-instructions.md` for your project** — use `/copilot-instructions-blueprint-generator` to scaffold one tailored to your tech stack, or run `/init` in a new workspace for a minimal starter
 3. Cherry-pick from `instructions/`, `agents/`, `prompts/`, and `skills/` based on your needs
 4. Customize downstream copies freely — divergence is expected and encouraged
 
