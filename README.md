@@ -175,6 +175,10 @@ These templates are built around the following technologies, though many are lan
 
 For full authoring standards and hard rules, see [`.github/copilot-instructions.md`](.github/copilot-instructions.md).
 
+## Attribution
+
+Many of the templates in this library were sourced from or inspired by [awesome-copilot](https://github.com/gabrielchua/awesome-copilot), a community-curated collection of GitHub Copilot instructions and agents. Templates sourced externally are reviewed and adapted to be project- and tech-agnostic where appropriate.
+
 ## License
 
 This is a personal template library. See individual files for attribution where sourced from community resources.
