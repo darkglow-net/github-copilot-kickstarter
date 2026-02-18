@@ -8,6 +8,57 @@ This repository is a knowledge base, not an application. It contains portable te
 
 Copy what you need into your project's `.github/` folder, customize to fit, and move on.
 
+## Copilot MD File Types
+
+GitHub Copilot uses four types of markdown files, each with a distinct role. VS Code loads them from `.github/` in your project root.
+
+| Type | VS Code Path | Loaded | Purpose |
+|------|-------------|--------|---------|
+| **copilot-instructions.md** | `.github/copilot-instructions.md` | Always — every Copilot request | Project-wide context: tech stack, hard rules, conventions, and tool routing |
+| **Instructions** | `.github/instructions/*.instructions.md` | Automatically, filtered by `applyTo` glob | Persistent rules applied to every request matching a file pattern |
+| **Agents** | `.github/agents/*.agent.md` | On demand via `@agent-name` | Specialized persona with scoped behavior for a task category |
+| **Prompts** | `.github/prompts/*.prompt.md` | On demand via `/prompt-name` | Reusable workflow trigger — a scripted starting point for a task |
+| **Skills** | `.github/skills/*/SKILL.md` | Referenced by agents/prompts | Bundled domain knowledge with scripts, references, or assets |
+
+### How they differ
+
+- **Instructions** are passive context — Copilot reads them silently when you edit matching files. They set coding standards, conventions, and guardrails without any user action.
+- **Agents** are interactive personas — you invoke them for a conversation. They carry specialized expertise and behavioral rules for a category of work (e.g., TDD, code review, debugging).
+- **Prompts** are one-shot workflow starters — they template a specific task with variables like `${file}` and kick off a structured action. Think "run this playbook."
+- **Skills** are reference bundles — they package domain knowledge, scripts, and assets that agents or prompts can pull in. They don't run on their own.
+
+### When to use which
+
+```mermaid
+flowchart TD
+    A[I need Copilot to...] --> B{Apply rules automatically
+    when editing files?}
+    B -- Yes --> C[✅ Instruction]
+    B -- No --> D{Have an ongoing conversation
+    with specialized expertise?}
+    D -- Yes --> E[✅ Agent]
+    D -- No --> F{Run a repeatable
+    workflow or scaffold?}
+    F -- Yes --> G[✅ Prompt]
+    F -- No --> H{Bundle reference docs,
+    scripts, or assets for
+    reuse by agents/prompts?}
+    H -- Yes --> I[✅ Skill]
+    H -- No --> J[Add it to
+    copilot-instructions.md]
+```
+
+### Context budget
+
+Every file Copilot loads consumes context window tokens. More files loaded means less room for your actual code and conversation.
+
+- **copilot-instructions.md** loads on every request — keep it lean and directive, not informational
+- **Instructions** that match `applyTo: '**'` load on every request too — reserve this for truly universal rules
+- **Agents** and **prompts** only load when invoked, so they're cheaper — put specialized knowledge there instead of in always-on instructions
+- **Skills** are only pulled in by reference, making them ideal for large reference material that shouldn't always be in context
+
+Rule of thumb: if Copilot's responses feel generic or it starts ignoring your rules, you're likely loading too much context. Narrow your `applyTo` globs and move specialized knowledge into agents or skills.
+
 ## Quick Start
 
 1. Open this workspace alongside your target project in VS Code
