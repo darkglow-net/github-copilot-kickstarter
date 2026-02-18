@@ -59,6 +59,22 @@ Every file Copilot loads consumes context window tokens. More files loaded means
 
 Rule of thumb: if Copilot's responses feel generic or it starts ignoring your rules, you're likely loading too much context. Narrow your `applyTo` globs and move specialized knowledge into agents or skills.
 
+### Tools and MCP servers
+
+Beyond markdown files, Copilot agents can call **tools** — functions that let them take real actions like running terminal commands, reading files, searching code, or querying external APIs.
+
+VS Code provides built-in tools automatically. You extend them with **MCP (Model Context Protocol) servers** — lightweight services that expose domain-specific tools through a standardized JSON-RPC interface. Any MCP server works with any MCP-compatible client, making them portable across editors and AI platforms.
+
+| Tool source | Examples | Value |
+|-------------|----------|-------|
+| **VS Code built-in** | File read/write, terminal, search, diagnostics | Core editor actions — always available, no setup |
+| **MCP servers** | GitHub API, Brave Search, Microsoft Docs, library docs (Context7) | External knowledge and actions via a standard protocol |
+| **Custom MCP servers** | Project-specific APIs, internal databases, CI/CD triggers | Extend Copilot's reach to your own systems |
+
+MCP servers are referenced in your VS Code settings (`.vscode/mcp.json` or `settings.json`) and agents can use them by tool name. The key benefit is **standardized communication** — one protocol for discovery, invocation, and response, so agents don't need custom integration code for each service.
+
+In this library, `copilot-instructions.md` includes a routing table mapping common needs to specific MCP tools, so agents know which tool to call without guessing.
+
 ## Quick Start
 
 1. Open this workspace alongside your target project in VS Code
