@@ -1,49 +1,11 @@
 # Workspace Baseline — AI Agent Instructions
 
-**Purpose**: Template catalog of reusable Copilot MD files (agents, prompts, instructions, skills) for bootstrapping new coding projects.
+**Purpose**: Template catalog of reusable Copilot MD files (agents, prompts, instructions, skills) for bootstrapping new coding projects. Root folders are the authoritative library; `.github/` is a downstream consumer. See `README.md` for full catalog contents, tech stack coverage, and repository structure.
 
 ---
 
-## Repository Layout
+## Development Constraints
 
-```
-instructions/                     # Root catalog — authoritative templates
-agents/                           # Root catalog — authoritative agent definitions
-prompts/                          # Root catalog — authoritative prompt triggers
-skills/                           # Root catalog — authoritative skill definitions
-.specify/                         # SpecKit framework — templates and scripts
-.github/                          # Consumer — files drawn from root for THIS workspace
-  copilot-instructions.md         # This file — routing for AI agents working here
-  instructions/                   # Subset of root instructions active for this workspace
-  agents/                         # Subset of root agents active for this workspace
-  prompts/                        # Subset of root prompts active for this workspace
-```
-
-**Ownership model**:
-- **Root folders** = Authoritative library. All templates originate here.
-- **`.github/`** = Downstream consumer drawn from root, like any other project would.
-- Downstream copies are expected to diverge to suit project needs — no sync enforcement.
-- This workspace is a library, not a version control or content moderation system.
-
----
-
-## Tech Stack Focus
-
-These templates target the following primary technologies:
-
-| Category | Technologies |
-|----------|-------------|
-| **Backend** | PowerShell 7.5+, InvokeBuild |
-| **Testing** | Pester 5.7+, Vitest, Playwright (TypeScript) |
-| **Frontend** | Alpine.js 3.x, Chart.js 4.x, HTML5, JavaScript ES6+ |
-| **Database** | SQLite (Microsoft.Data.Sqlite, sql.js WASM) |
-| **Containerization** | Docker (Python/Node isolation, multi-stage builds) |
-| **M365** | Microsoft Graph SDK, Declarative Agents, MCP integration |
-| **MCP Servers** | Python (Docker), TypeScript (Docker) |
-| **Analysis** | PSScriptAnalyzer (custom rules), esbuild |
-| **Workflow** | TDD (Red/Green/Refactor), constitutional development, spec-driven |
-
-### Development Environment
 - **OS**: Windows + WSL
 - **No local Python/Node** — use Docker isolation for Python and Node.js tooling
 - **Package management**: Bundled `lib/` for PowerShell modules, npm for JS build only
@@ -57,19 +19,8 @@ These templates target the following primary technologies:
 3. **Agent frontmatter** must include `description` and `name` fields
 4. **MCP tools are mandatory** for external knowledge — never guess API signatures or version numbers
 5. **Subagent delegation** — use subagents for 3+ file research or complex multi-step tasks
-
----
-
-## How to Use This Baseline
-
-### Initializing a New Project
-1. Create new project with `.github/` folder
-2. Open workspace-baseline alongside the new project
-3. **Start with `copilot-instructions.md`** — adapt the routing file for the new project
-4. Cherry-pick instruction files from `instructions/` based on project tech stack
-5. Copy agents from `agents/` — TDD agents + debug mode are universal
-6. Copy prompts from `prompts/` — `workon.*` prompts are the primary workflow triggers
-7. Customize downstream copies to suit the project — divergence is expected
+6. **Update README.md** — when adding, removing, or renaming agents, prompts, instructions, or skills, update the corresponding table in the root `README.md` to keep the catalog accurate
+7. **Record significant decisions as ADRs** — structural changes, new conventions, philosophy shifts, or technology additions must be captured in `docs/adr/` using the ADR template
 
 ---
 
@@ -93,6 +44,37 @@ When creating or modifying templates in this baseline:
 - [ ] Code examples are technology-appropriate
 - [ ] MCP tool references are correct (tool names, parameter patterns)
 - [ ] Authoritative version exists in root catalog
+- [ ] `README.md` tables updated if catalog contents changed
+- [ ] ADR created in `docs/adr/` if this is a significant decision or convention change
+
+---
+
+## Documentation Requirements
+
+All documentation lives in the `docs/` folder. Keep it current as the library evolves.
+
+| Area | Path | When to update |
+|------|------|----------------|
+| **Architecture** | `docs/architecture/` | New structural patterns, design overviews, or system diagrams |
+| **ADRs** | `docs/adr/` | Any significant decision: new conventions, philosophy changes, technology additions, structural reorganization |
+| **Development** | `docs/development/` | Workflow changes, iteration logs, contributing guidelines |
+| **Prompt Craft** | `docs/prompt-craft/` | Prompt experiments, lessons learned, refined techniques |
+
+### README Maintenance
+
+The root `README.md` is the first thing visitors and AI agents read. When catalog contents change:
+
+- **Added a template?** → Add it to the matching `What's Inside` table (Instructions / Agents / Prompts / Skills)
+- **Removed or renamed?** → Update or remove the entry
+- **New tech stack?** → Update the `Tech Stack Coverage` section
+- **New docs area?** → Add a row to the `Docs` table
+
+### ADR Workflow
+
+1. Create a new file in `docs/adr/` named `NNNN-short-title.md` (zero-padded sequence number)
+2. Follow the template in `docs/adr/README.md` (Title, Status, Context, Decision, Consequences)
+3. Update the index table in `docs/adr/README.md`
+4. Set status to **Proposed** initially — change to **Accepted** once confirmed
 
 ---
 
