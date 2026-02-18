@@ -21,6 +21,7 @@
 5. **Subagent delegation** — use subagents for 3+ file research or complex multi-step tasks
 6. **Update README.md** — when adding, removing, or renaming agents, prompts, instructions, or skills, update the corresponding table in the root `README.md` to keep the catalog accurate
 7. **Record significant decisions as ADRs** — structural changes, new conventions, philosophy shifts, or technology additions must be captured in `docs/adr/` using the ADR template
+8. **Sanitize community templates** — files sourced from awesome-copilot or other external repositories must be reviewed and made project- and tech-agnostic where appropriate; tech-specific templates (e.g., a PHP agent) may retain their specificity but must not contain project-specific references
 
 ---
 
@@ -44,6 +45,7 @@ When creating or modifying templates in this baseline:
 - [ ] Code examples are technology-appropriate
 - [ ] MCP tool references are correct (tool names, parameter patterns)
 - [ ] Authoritative version exists in root catalog
+- [ ] If sourced externally: reviewed for project-specific contamination and made tech-agnostic where the template is not inherently technology-specific
 - [ ] `README.md` tables updated if catalog contents changed
 - [ ] ADR created in `docs/adr/` if this is a significant decision or convention change
 
