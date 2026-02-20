@@ -31,6 +31,22 @@ Customize this section for your workspace. The workflow references these setting
 | Implementation | `speckit.implement` | Executes task plan phase-by-phase |
 | Code Review | `code-review` | Fresh-context validation and compliance check |
 
+### Agents (Specialized — optional)
+
+<!--
+  Add specialized agents your project uses. Examples:
+  | Role | Agent | When to Use |
+  |------|-------|-------------|
+  | Security Review | `SE: Security` | Phase 5 — security-sensitive features |
+  | TDD: Write Tests | `TDD Red Phase` | Phase 4 — dedicated test writing before implementation |
+  | TDD: Implement | `TDD Green Phase` | Phase 4 — make failing tests pass |
+  | TDD: Refactor | `TDD Refactor Phase` | Phase 4 — improve quality while keeping tests green |
+  | Documentation | `SE: Tech Writer` | Phase 7 — user-facing documentation changes |
+  | ADR | `ADR Generator` | Phase 7 — when architectural decisions were made |
+  | Debug | `debug.mode` | Any phase — when stuck on a specific bug |
+  Remove this comment block after customizing.
+-->
+
 ### Test & Validation
 
 | Action | Command | Notes |
@@ -77,7 +93,7 @@ When external knowledge is needed, use these tools **if configured** in your wor
 - NEVER delegate without providing USER REQUEST, research context, and working directory
 - NEVER skip Phase 5 (Code Review) — even for "simple" features
 - NEVER write a todo list update missing IDs 7-8 (Validate and Document)
-- ALWAYS read PROGRESS.md before each phase transition (after Phase 2 creates it)
+- ALWAYS read PROGRESS.json before each phase transition (after Phase 2 creates it)
 - ALWAYS execute the Phase Transition Protocol between phases
 
 ---
@@ -116,21 +132,32 @@ Every `manage_todo_list` call MUST include ALL 8 items. Dynamic tasks use IDs 10
 
 **Before EVERY phase transition**, the coordinator MUST:
 
-1. **Read** PROGRESS.md from the spec directory (after Phase 2 creates it)
-2. **Verify** all remaining phases are tracked in both todo list and PROGRESS.md
+1. **Read** PROGRESS.json from the spec directory (after Phase 2 creates it)
+2. **Verify** all remaining phases are tracked in both todo list and PROGRESS.json
 3. **Update** both artifacts:
-   - Mark current phase ✅ complete in PROGRESS.md
-   - Mark next phase 🔄 in-progress
-   - Confirm remaining phases exist and are ⬜ not-started
+   - Set current phase `status` to `"completed"` with `completedAt` timestamp and `summary` in PROGRESS.json
+   - Set next phase `status` to `"in-progress"` with `startedAt` timestamp
+   - Confirm remaining phases exist and are `"not-started"`
 4. **Report** to user: "Phase X complete → Phase Y. Remaining: [list remaining phases]"
 
-⚠️ If PROGRESS.md is missing or corrupted, HALT and recreate it from the todo list before proceeding.
+⚠️ If PROGRESS.json is missing or corrupted, HALT and recreate it from the todo list state before proceeding.
+
+---
+
+## Subagent Delegation Rules
+
+Applies to ALL phases that delegate.
+
+- Subagents **analyze and distill** — never use them to relay raw file contents back
+- Delegate for: cross-subsystem analysis, large file (500+ line) extraction, specialized work (TDD, review, security), MCP knowledge distillation
+- Read directly when: you'll edit the file, files are small/related, or ≤3 files in one subsystem
+- If you need full contents, read them yourself — a subagent returning unmodified file contents wastes both contexts
 
 ---
 
 ## Phase 1: Coordinator Research
 
-**Coordinator executes directly** (DO NOT delegate).
+**Coordinator executes directly** (DO NOT delegate research — you need the context for Phase 2 handoff).
 
 ### Research Steps
 
@@ -169,25 +196,39 @@ The specify agent owns branch creation and spec file generation via `.specify/` 
 **Coordinator post-delegation**:
 1. Verify branch: `git branch --show-current` — HALT if not on feature branch
 2. Verify spec file exists and contains complete specification
-3. **Create PROGRESS.md** in the spec directory with this format:
+3. **Create PROGRESS.json** in the spec directory with this structure:
 
-```markdown
-# Progress: {feature-name}
-
-Branch: {branch-name}
-Spec: {spec-file-path}
-
-| Phase | Status | Notes |
-|-------|--------|-------|
-| 1. Research | ✅ | [research summary headline] |
-| 2. Specification | ✅ | spec.md created |
-| 3a. Plan | ⬜ | |
-| 3b. Tasks | ⬜ | |
-| 4. Implement | ⬜ | |
-| 5. Code Review | ⬜ | Attempts: 0/2 |
-| 6. Validate | ⬜ | |
-| 7. Document | ⬜ | |
+```json
+{
+  "feature": "{feature-name}",
+  "branch": "{branch-name}",
+  "spec": "{spec-file-path}",
+  "phases": {
+    "research":      { "status": "completed", "startedAt": "{ISO-8601}", "completedAt": "{ISO-8601}", "summary": "{research summary headline}" },
+    "specification": { "status": "completed", "startedAt": "{ISO-8601}", "completedAt": "{ISO-8601}", "summary": "spec.md created" },
+    "plan":          { "status": "not-started", "startedAt": null, "completedAt": null, "summary": null },
+    "tasks":         { "status": "not-started", "startedAt": null, "completedAt": null, "summary": null },
+    "implement":     { "status": "not-started", "startedAt": null, "completedAt": null, "summary": null },
+    "review":        { "status": "not-started", "startedAt": null, "completedAt": null, "summary": null, "attempts": 0, "maxAttempts": 2, "findings": [] },
+    "validate":      { "status": "not-started", "startedAt": null, "completedAt": null, "summary": null },
+    "document":      { "status": "not-started", "startedAt": null, "completedAt": null, "summary": null }
+  },
+  "context": {
+    "affectedModules": ["{list from Phase 1 research}"],
+    "priorSpecs": ["{related spec names}"],
+    "constraints": ["{applicable constraints}"],
+    "researchNotes": "{key findings from Phase 1}"
+  },
+  "haltReason": null
+}
 ```
+
+**Schema notes**:
+- `phases.*.status`: `"not-started"` | `"in-progress"` | `"completed"` | `"blocked"`
+- `context`: Persists Phase 1 research across session breaks — populate from research output
+- `review.findings[]`: `{ "severity": "critical|high|medium|low", "file": "path", "description": "...", "requirement": "FR-### or null" }`
+- `haltReason`: Set when workflow stops unexpectedly — describes what's needed to resume
+- Timestamps use ISO 8601 format (e.g., `"2026-02-20T10:30:00Z"`)
 
 4. Execute Phase Transition Protocol. Mark Phase 2 complete.
 
@@ -231,10 +272,15 @@ Execute Phase Transition Protocol. Mark Phase 3b complete.
 - ⚠️ **Context anchor**: "After implementation, the coordinator proceeds to Phase 5 (Code Review), Phase 6 (Validate), and Phase 7 (Document). The implement agent does NOT manage these phases."
 - **MCP mandate**: Use available MCP tools for external library docs and API verification. Do NOT rely on training data for API signatures or version numbers.
 
+**TDD Agent Alternative**: For features with complex logic, the coordinator MAY delegate the test-first cycle to TDD agents instead of (or in addition to) speckit.implement:
+1. `TDD Red Phase` — write failing tests from task requirements
+2. `TDD Green Phase` — implement minimal code to pass tests
+3. `TDD Refactor Phase` — improve quality while maintaining green tests
+
 **Coordinator post-delegation**:
 1. Verify all tasks in tasks.md are marked complete (`[X]`)
 2. Run `get_errors` on modified files — report any issues
-3. **Read PROGRESS.md** — verify phases 5-7 are still tracked as ⬜ not-started
+3. **Read PROGRESS.json** — verify phases review/validate/document are still `"not-started"`
 
 Execute Phase Transition Protocol. Mark Phase 4 complete.
 
@@ -244,7 +290,9 @@ Execute Phase Transition Protocol. Mark Phase 4 complete.
 
 **Delegate to**: `code-review` agent
 
-**Attempts tracked**: PROGRESS.md records review iteration count. Maximum 2 attempts before escalation.
+**Optional: Security Review** — If the feature touches security-sensitive areas (authentication, file I/O, network, user input), consider additionally delegating to a security-focused review agent. Security findings feed into the same approval/rejection flow below.
+
+**Attempts tracked**: PROGRESS.json `review.attempts` field. Maximum 2 attempts (`review.maxAttempts`) before escalation.
 
 **Delegation prompt MUST include**:
 - Spec file path, branch name
@@ -261,8 +309,8 @@ Execute Phase Transition Protocol. Mark Phase 4 complete.
 
 ### Rejection Handling
 
-1. Increment review attempt counter in PROGRESS.md
-2. **If attempt ≤ 2**:
+1. Increment `review.attempts` in PROGRESS.json and append findings to `review.findings[]`
+2. **If attempt ≤ `review.maxAttempts`**:
    - Insert fix tasks (IDs 100+) into todo list
    - **PRESERVE IDs 7-8** (Validate and Document) — verify they exist before submitting the update
    - Return to Phase 4 with fix tasks only (do not re-run all implementation tasks)
@@ -317,11 +365,11 @@ Execute Phase Transition Protocol. Mark Phase 6 complete.
 1. **Spec updates**: If any requirements changed during implementation, update spec.md to reflect actuals
 2. **Architecture docs**: If new components, patterns, or integrations were added:
    - Update relevant architecture documentation (if it exists)
-   - Create an ADR if a significant architectural decision was made (if ADR directory exists)
+   - If a significant architectural decision was made, consider delegating to `ADR Generator` to create an ADR (if ADR directory exists)
 3. **User-facing docs**: If the feature changes user-visible behavior:
-   - Update or create relevant user documentation
+   - Consider delegating to `SE: Tech Writer` for documentation updates
    - Add usage examples if applicable
-4. **PROGRESS.md**: Mark all phases complete, add final summary
+4. **PROGRESS.json**: Mark all phases `"completed"`, set `haltReason` to `null`, add final summary to each phase
 
 ### Documentation Report
 
@@ -344,7 +392,7 @@ Mark Phase 7 complete.
 - [ ] No lint/compile errors
 - [ ] Spec success criteria validated
 - [ ] Documentation updated (or justified as unnecessary)
-- [ ] PROGRESS.md shows all phases ✅
+- [ ] PROGRESS.json shows all phases `"completed"`
 
 **Final Report**: Spec number, branch, implementation summary, test results, documentation changes, next steps (merge/PR).
 
@@ -358,7 +406,7 @@ Mark Phase 7 complete.
 | Test failures in Phase 4 | Normal TDD — fix in implementation. Not a workflow error |
 | Code review REJECTED (attempt ≤ 2) | Insert fix tasks (IDs 100+), **PRESERVE IDs 7-8**, return to Phase 4 |
 | Code review REJECTED (attempt > 2) | **HALT** — escalate to user with full analysis |
-| PROGRESS.md missing or corrupted | Recreate from todo list state before continuing |
+| PROGRESS.json missing or corrupted | Recreate from todo list state before continuing |
 | Branch not on feature branch | HALT — resolve git state before continuing |
 | MCP tool unavailable | Use fallback from Configuration table. Note limitation to user |
 | Todo list update | **ALWAYS** include ALL 8 items (IDs 1-8) plus dynamic tasks (100+) |
