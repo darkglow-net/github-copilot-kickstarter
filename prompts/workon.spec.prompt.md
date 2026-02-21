@@ -294,10 +294,13 @@ Execute Phase Transition Protocol. Mark Phase 4 complete.
 
 **Attempts tracked**: PROGRESS.json `review.attempts` field. Maximum 2 attempts (`review.maxAttempts`) before escalation.
 
+**Pre-review error check**: Run `get_errors` on all modified files BEFORE delegating. Include any findings in the delegation prompt — the review agent cannot access IDE diagnostics and is blind to compile/lint errors unless you pass them.
+
 **Delegation prompt MUST include**:
 - Spec file path, branch name
 - Review scope: spec compliance, test coverage, security, code quality
 - Changed files summary (from `get_changed_files`)
+- Error/warning summary (from `get_errors` on modified files)
 
 **Coordinator Decision**:
 

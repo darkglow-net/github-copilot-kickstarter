@@ -124,6 +124,8 @@ Before moving to the next phase:
 
 ## Phase 4: Code Review
 
+**Pre-review error check**: Run `get_errors` on all modified files BEFORE delegating. Include any findings in the delegation prompt — the review agent cannot access IDE diagnostics and is blind to compile/lint errors unless you pass them.
+
 **Delegate to Code Review Agent**: Fresh-context validation.
 
 **Attempts tracked**: Maximum 2 review iterations before escalation.
