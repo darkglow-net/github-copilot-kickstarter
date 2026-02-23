@@ -1,6 +1,5 @@
 ---
-description: Perform a non-destructive cross-artifact consistency and quality analysis across spec.md, plan.md, and tasks.md for workspace-baseline template features.
-name: SpecKit Analyze
+description: Perform a non-destructive cross-artifact consistency and quality analysis across spec.md, plan.md, and tasks.md after task generation.
 ---
 
 ## User Input
@@ -15,20 +14,11 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 Identify inconsistencies, duplications, ambiguities, and underspecified items across the three core artifacts (`spec.md`, `plan.md`, `tasks.md`) before implementation. This command MUST run only after `/speckit.tasks` has successfully produced a complete `tasks.md`.
 
-## Workspace Context
-
-This is **workspace-baseline** — a template library of reusable GitHub Copilot MD files. Features here are typically new templates, structural reorganizations, or workflow improvements. Analysis should account for:
-- Templates must be generic/portable (no hardcoded project references in root versions)
-- Naming conventions must follow established patterns (see `copilot-instructions.md`)
-- README.md sync is a mandatory deliverable for any catalog change
-- ADRs are required for significant decisions
-- No test runner exists — validation is structural (frontmatter, naming, cross-references)
-
 ## Operating Constraints
 
-**STRICTLY READ-ONLY**: Do **not** modify any files. Output a structured analysis report. Offer an optional remediation plan (user must explicitly approve before any edits).
+**STRICTLY READ-ONLY**: Do **not** modify any files. Output a structured analysis report. Offer an optional remediation plan (user must explicitly approve before any follow-up editing commands would be invoked manually).
 
-**Constitution Authority**: If `.specify/memory/constitution.md` exists and is populated, it is **non-negotiable**. Constitution conflicts are automatically CRITICAL. If no constitution is populated, skip constitution checks and note this in the report.
+**Constitution Authority**: The project constitution (`.specify/memory/constitution.md`) is **non-negotiable** within this analysis scope. Constitution conflicts are automatically CRITICAL and require adjustment of the spec, plan, or tasks—not dilution, reinterpretation, or silent ignoring of the principle. If a principle itself needs to change, that must occur in a separate, explicit constitution update outside `/speckit.analyze`.
 
 ## Execution Steps
 
@@ -40,13 +30,15 @@ Run `.specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -In
 - PLAN = FEATURE_DIR/plan.md
 - TASKS = FEATURE_DIR/tasks.md
 
-Abort with an error message if any required file is missing.
+Abort with an error message if any required file is missing (instruct the user to run missing prerequisite command).
+For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
 ### 2. Load Artifacts (Progressive Disclosure)
 
 Load only the minimal necessary context from each artifact:
 
 **From spec.md:**
+
 - Overview/Context
 - Functional Requirements
 - Non-Functional Requirements
@@ -54,129 +46,139 @@ Load only the minimal necessary context from each artifact:
 - Edge Cases (if present)
 
 **From plan.md:**
+
 - Architecture/stack choices
+- Data Model references
 - Phases
 - Technical constraints
-- File paths and naming conventions
 
 **From tasks.md:**
+
 - Task IDs
 - Descriptions
 - Phase grouping
 - Parallel markers [P]
 - Referenced file paths
 
-**From constitution** (if populated):
+**From constitution:**
+
 - Load `.specify/memory/constitution.md` for principle validation
 
 ### 3. Build Semantic Models
 
-Create internal representations (do not output raw artifacts):
+Create internal representations (do not include raw artifacts in output):
 
-- **Requirements inventory**: Each functional + non-functional requirement with a stable key
-- **Task coverage mapping**: Map each task to one or more requirements
-- **Constitution rule set** (if available): Extract principle names and normative statements
+- **Requirements inventory**: Each functional + non-functional requirement with a stable key (derive slug based on imperative phrase; e.g., "User can upload file" → `user-can-upload-file`)
+- **User story/action inventory**: Discrete user actions with acceptance criteria
+- **Task coverage mapping**: Map each task to one or more requirements or stories (inference by keyword / explicit reference patterns like IDs or key phrases)
+- **Constitution rule set**: Extract principle names and MUST/SHOULD normative statements
 
-### 4. Detection Passes
+### 4. Detection Passes (Token-Efficient Analysis)
 
-Focus on high-signal findings. Limit to 50 findings total.
+Focus on high-signal findings. Limit to 50 findings total; aggregate remainder in overflow summary.
 
-#### A. Template Library-Specific Checks
+#### A. Duplication Detection
 
-- Tasks that create files — do they follow naming conventions?
-- Tasks that modify root templates — do they also update `.github/` copies?
-- Tasks that add/remove templates — is there a README.md update task?
-- Tasks involving decisions — is there an ADR creation task?
-- Frontmatter requirements specified for new template files?
-
-#### B. Duplication Detection
-
-- Near-duplicate requirements
+- Identify near-duplicate requirements
 - Mark lower-quality phrasing for consolidation
 
-#### C. Ambiguity Detection
+#### B. Ambiguity Detection
 
-- Vague adjectives (fast, scalable, robust) lacking measurable criteria
-- Unresolved placeholders (TODO, TKTK, ???, `<placeholder>`)
+- Flag vague adjectives (fast, scalable, secure, intuitive, robust) lacking measurable criteria
+- Flag unresolved placeholders (TODO, TKTK, ???, `<placeholder>`, etc.)
 
-#### D. Underspecification
+#### C. Underspecification
 
 - Requirements with verbs but missing object or measurable outcome
+- User stories missing acceptance criteria alignment
 - Tasks referencing files or components not defined in spec/plan
 
-#### E. Constitution Alignment (if available)
+#### D. Constitution Alignment
 
 - Any requirement or plan element conflicting with a MUST principle
-- Missing mandated sections or quality gates
+- Missing mandated sections or quality gates from constitution
 
-#### F. Coverage Gaps
+#### E. Coverage Gaps
 
 - Requirements with zero associated tasks
-- Tasks with no mapped requirement
-- Non-functional requirements not reflected in tasks
+- Tasks with no mapped requirement/story
+- Non-functional requirements not reflected in tasks (e.g., performance, security)
 
-#### G. Inconsistency
+#### F. Inconsistency
 
-- Terminology drift across files
-- Task ordering contradictions
-- Conflicting requirements
+- Terminology drift (same concept named differently across files)
+- Data entities referenced in plan but absent in spec (or vice versa)
+- Task ordering contradictions (e.g., integration tasks before foundational setup tasks without dependency note)
+- Conflicting requirements (e.g., one requires Next.js while other specifies Vue)
 
 ### 5. Severity Assignment
 
-- **CRITICAL**: Constitution violation, missing core artifact, requirement with zero coverage blocking baseline functionality
-- **HIGH**: Duplicate/conflicting requirement, ambiguous quality attribute, missing README update task
-- **MEDIUM**: Terminology drift, missing non-functional coverage, underspecified edge case
-- **LOW**: Style/wording improvements, minor redundancy
+Use this heuristic to prioritize findings:
 
-### 6. Produce Analysis Report
+- **CRITICAL**: Violates constitution MUST, missing core spec artifact, or requirement with zero coverage that blocks baseline functionality
+- **HIGH**: Duplicate or conflicting requirement, ambiguous security/performance attribute, untestable acceptance criterion
+- **MEDIUM**: Terminology drift, missing non-functional task coverage, underspecified edge case
+- **LOW**: Style/wording improvements, minor redundancy not affecting execution order
 
-Output a Markdown report (no file writes):
+### 6. Produce Compact Analysis Report
 
-```markdown
+Output a Markdown report (no file writes) with the following structure:
+
 ## Specification Analysis Report
 
 | ID | Category | Severity | Location(s) | Summary | Recommendation |
 |----|----------|----------|-------------|---------|----------------|
-| A1 | Template | HIGH | tasks.md:L45 | New instruction added without README update task | Add README.md sync task |
+| A1 | Duplication | HIGH | spec.md:L120-134 | Two similar requirements ... | Merge phrasing; keep clearer version |
 
-**Coverage Summary:**
+(Add one row per finding; generate stable IDs prefixed by category initial.)
+
+**Coverage Summary Table:**
 
 | Requirement Key | Has Task? | Task IDs | Notes |
 |-----------------|-----------|----------|-------|
 
-**Template Library Checks:**
-- [ ] Naming conventions followed
-- [ ] README sync task exists
-- [ ] ADR task exists (if significant decision)
-- [ ] Frontmatter requirements specified
-- [ ] Root-first file creation order
-
-**Constitution Alignment Issues:** (if applicable)
+**Constitution Alignment Issues:** (if any)
 
 **Unmapped Tasks:** (if any)
 
 **Metrics:**
+
 - Total Requirements
 - Total Tasks
-- Coverage %
+- Coverage % (requirements with >=1 task)
 - Ambiguity Count
-- Template Convention Violations
-```
+- Duplication Count
+- Critical Issues Count
 
-### 7. Next Actions
+### 7. Provide Next Actions
+
+At end of report, output a concise Next Actions block:
 
 - If CRITICAL issues exist: Recommend resolving before `/speckit.implement`
-- If only LOW/MEDIUM: User may proceed with noted improvements
-- Provide explicit command suggestions
+- If only LOW/MEDIUM: User may proceed, but provide improvement suggestions
+- Provide explicit command suggestions: e.g., "Run /speckit.specify with refinement", "Run /speckit.plan to adjust architecture", "Manually edit tasks.md to add coverage for 'performance-metrics'"
 
 ### 8. Offer Remediation
 
-Ask: "Would you like me to suggest concrete remediation edits for the top N issues?" (Do NOT apply automatically.)
+Ask the user: "Would you like me to suggest concrete remediation edits for the top N issues?" (Do NOT apply them automatically.)
 
 ## Operating Principles
 
-- **NEVER modify files** (read-only analysis)
-- **NEVER hallucinate missing sections** (report accurately)
-- **Prioritize template convention violations** (these are workspace-specific CRITICAL/HIGH)
-- **Use examples over exhaustive rules** (cite specific instances)
+### Context Efficiency
+
+- **Minimal high-signal tokens**: Focus on actionable findings, not exhaustive documentation
+- **Progressive disclosure**: Load artifacts incrementally; don't dump all content into analysis
+- **Token-efficient output**: Limit findings table to 50 rows; summarize overflow
+- **Deterministic results**: Rerunning without changes should produce consistent IDs and counts
+
+### Analysis Guidelines
+
+- **NEVER modify files** (this is read-only analysis)
+- **NEVER hallucinate missing sections** (if absent, report them accurately)
+- **Prioritize constitution violations** (these are always CRITICAL)
+- **Use examples over exhaustive rules** (cite specific instances, not generic patterns)
 - **Report zero issues gracefully** (emit success report with coverage statistics)
+
+## Context
+
+$ARGUMENTS

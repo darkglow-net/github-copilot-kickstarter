@@ -1,6 +1,5 @@
 ---
 description: Generate a custom checklist for the current feature based on user requirements.
-name: SpecKit Checklist
 ---
 
 ## Checklist Purpose: "Unit Tests for English"
