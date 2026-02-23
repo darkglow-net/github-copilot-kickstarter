@@ -9,13 +9,15 @@ applyTo: '**/*.ps1'
 
 - **PowerShell 7.5+** syntax only (no Windows PowerShell 5.1 compatibility)
 - Cross-platform by default (Windows, Linux, macOS, containers)
-- Use `Join-Path` for all path operations (never hardcode `\` or `/`)
+- `Join-Path` for all path operations (never hardcode `\` or `/`)
+- Full cmdlet names only — never aliases (`gci`, `?`, `%`) in scripts
 
 ## Function Structure
 
 ```powershell
 function Verb-Noun {
     [CmdletBinding()]
+    [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
@@ -26,123 +28,119 @@ function Verb-Noun {
         [string]$Path
     )
 
-    try {
-        # Implementation
-    }
-    catch {
-        Write-Error "Error processing '$Name': $_"
-        throw
+    process {
+        try {
+            $result = Get-Item -LiteralPath $Path -ErrorAction Stop
+            $result
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($PSItem)
+        }
     }
 }
 ```
 
 **Function Rules:**
-- ✅ Always use `[CmdletBinding()]` on public functions
-- ✅ Use `[ValidateScript()]`, `[ValidateSet()]`, `[ValidateNotNullOrEmpty()]` for input validation
-- ✅ Use `[Parameter(Mandatory)]` for required parameters
-- ✅ Prefix unused parameters with `_` (e.g., `$_options`)
+- Always `[CmdletBinding()]` — enables `-Verbose`, `-ErrorAction`, common parameters
+- Always `[OutputType()]` — documents return type for callers and tooling
+- Validate every parameter — `[ValidateNotNullOrEmpty()]`, `[ValidateSet()]`, `[ValidateRange()]`, `[ValidateScript()]`
+- `SupportsShouldProcess` on any function that modifies state
+- `-LiteralPath` for user-provided paths (prevents wildcard injection)
+- Prefix unused parameters with `_` (e.g., `$_options`)
+
+## Naming Conventions
+
+| Element | Convention | Example |
+|---------|-----------|---------|
+| Functions | Verb-Noun (approved verbs) | `Get-UserProfile` |
+| Parameters | PascalCase | `$OutputPath` |
+| Local variables | camelCase | `$itemCount` |
+| Script scope | `$script:PascalCase` | `$script:CacheData` |
+| Constants | UPPER_SNAKE_CASE | `$MAX_RETRIES` |
+
+## Error Handling
+
+```powershell
+# Typed exceptions for specific errors
+throw [System.IO.FileNotFoundException]::new("Config not found: $path")
+throw [System.ArgumentException]::new("Invalid format: $format")
+```
+
+- `-ErrorAction Stop` inside `try` — converts non-terminating to terminating
+- `$PSCmdlet.ThrowTerminatingError($PSItem)` — error points at caller, not internals
+- Never empty catch blocks — at minimum log the error
+- Include context in error messages: what failed, what value, what to do
 
 ## Performance Patterns
 
-- **Use `[System.Collections.Generic.List[Object]]`** for loops, never `@() +=`
-- **Use `$script:` hashtable caches** for O(1) lookups — never repeated lookups in loops
-- **Stream with `Get-ChildItem -File`** for large directories
-- **Use `-ErrorAction Stop`** in try blocks for proper exception handling
-- **Suppress output with `$null =`** assignment (faster than `| Out-Null` in loops)
+```powershell
+# FASTEST: Direct loop assignment (preferred)
+$results = foreach ($item in $collection) { Process-Item $item }
+
+# GOOD: List<T> for complex accumulation
+$list = [System.Collections.Generic.List[object]]::new()
+foreach ($item in $collection) { $list.Add((Process-Item $item)) }
+
+# NEVER: += in loops (copies entire array each iteration)
+```
+
+- **Hashtable caches** for O(1) lookups — never `Where-Object` in loops
+- **`$null =`** for output suppression (fastest)
+- **`-join`** for string building in loops — never `+=` concatenation
+- **`[pscustomobject]@{}`** for object creation — 5-7x faster than `New-Object`
 - **Set-based operations** — process collections as wholes, never row-by-row
 
-```powershell
-# ✅ GOOD: O(1) lookup cache
-$script:Lookup = @{}
-$items | ForEach-Object { $script:Lookup[$_.Id] = $_.Name }
+## PowerShell 7+ Operators
 
-# ❌ BAD: O(n) per-item lookup
-$name = ($items | Where-Object { $_.Id -eq $targetId }).Name
+```powershell
+$status = $isActive ? 'Active' : 'Inactive'   # Ternary
+$value = $config.Setting ?? 'default'          # Null-coalescing
+$config.Timeout ??= 30                         # Null-coalescing assignment
+```
+
+## Splatting
+
+```powershell
+# Preferred for 3+ parameters
+$params = @{ Path = $source; Destination = $dest; Force = $true }
+Copy-Item @params
 ```
 
 ## Security Patterns
 
-- **Never hardcode credentials** — use environment variables or SecretManagement module
+- **Never hardcode credentials** — use `[PSCredential]`, environment variables, or `SecretManagement`
 - **Validate all user input** — use `[ValidateScript()]` parameter attributes
-- **Use `-LiteralPath`** when accepting user-provided paths (prevents wildcard injection)
-- **Escape regex patterns** from user input with `[regex]::Escape()`
+- **Use `-LiteralPath`** for user-provided paths (prevents wildcard injection)
+- **Escape regex** from user input with `[regex]::Escape()`
+- **Never `Invoke-Expression`** with user input
 
-## Error Message Formatting
-
-```powershell
-# Include context and suggest action
-Write-Error "Failed to process file '$($file.Name)': Access denied. Check file permissions and retry."
-
-# Write-Verbose for debug info (respects -Verbose preference)
-Write-Verbose "Processing file: $($file.FullName)"
-
-# Write-Warning for non-blocking issues
-Write-Warning "Skipped inaccessible directory: $path"
-```
-
-## Advanced Error Handling
+## Output Streams
 
 ```powershell
-# In [CmdletBinding()] functions, use proper ErrorRecord construction
-if (-not (Test-Path $Path)) {
-    $errorRecord = [System.Management.Automation.ErrorRecord]::new(
-        [System.Exception]::new("Path not found: $Path"),
-        'PathNotFound',
-        [System.Management.Automation.ErrorCategory]::ObjectNotFound,
-        $Path
-    )
-    $PSCmdlet.WriteError($errorRecord)  # Non-terminating
-    # OR
-    $PSCmdlet.ThrowTerminatingError($errorRecord)  # Terminating
-}
-```
-
-## ShouldProcess Pattern (WhatIf/Confirm Support)
-
-```powershell
-function Remove-CacheFile {
-    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
-    param([Parameter(Mandatory)][string]$Path)
-
-    if ($PSCmdlet.ShouldProcess($Path, "Remove cache file")) {
-        Remove-Item -Path $Path -Force
-    }
-}
-# Use: -WhatIf (preview), -Confirm (prompt), ConfirmImpact: Low/Medium/High
+Write-Verbose "Debug-level detail"           # -Verbose to see
+Write-Information "Informational message"     # -InformationAction to see
+Write-Warning "Non-blocking issue"            # Always visible
+Write-Error "Error with context"             # Error stream
+# Never Write-Host in functions — bypasses output streams
 ```
 
 ## Module Patterns
 
-- **Public functions**: Export from module manifest `FunctionsToExport`
-- **Private functions**: Place in `Private/` or `src/private/`, dot-source in `.psm1`
-- **Nested modules**: Use `NestedModules` for domain-specific sub-modules
+- **Public functions**: Export explicitly from manifest `FunctionsToExport` — never `'*'`
+- **Private functions**: Place in `Private/`, dot-source in `.psm1`
 - **Module-level caches**: Use `$script:` scope for hashtables and lookup tables
 
-## Null Safety Patterns
+## Null Safety
 
-```powershell
-# ❌ BAD: Direct property access on potentially null collection
-for ($i = 0; $i -lt $items.Count; $i++) { }  # Fails if $items is $null
-
-# ✅ GOOD: Check for null/empty before accessing properties
-if ($items -and $items.Count -gt 0) {
-    for ($i = 0; $i -lt $items.Count; $i++) { }
-}
-
-# ❌ BAD: Measure-Object properties when collection is empty
-$totalSize = ($files | Measure-Object -Property Length -Sum).Sum  # .Sum is $null if no files
-
-# ✅ GOOD: Safe property access with fallback
-$stats = $files | Measure-Object -Property Length -Sum
-$totalSize = if ($stats -and $stats.Sum) { $stats.Sum } else { 0 }
-```
+- `$null` always on the left: `if ($null -eq $value)` — PSScriptAnalyzer rule
+- Check before property access: `if ($items -and $items.Count -gt 0)`
+- Guarantee array from pipeline: `$results = @(Get-ChildItem ...)`
 
 ## Validation
 
 ```powershell
-# Run tests before commit
 Invoke-Build Test
-
-# Analyze code quality
 Invoke-ScriptAnalyzer -Path '.' -Recurse -Settings ./PSScriptAnalyzerSettings.psd1
 ```
+
+> **Deep reference**: The `powershell-7` skill provides benchmarks, Pester 5 testing patterns, module development, cross-platform details, anti-patterns, and PSScriptAnalyzer configuration.
