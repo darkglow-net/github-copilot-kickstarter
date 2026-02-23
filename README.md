@@ -141,7 +141,7 @@ Workflow starters invoked via `/prompt-name` in Copilot Chat.
 
 Domain knowledge packages with embedded scripts, references, or assets.
 
-Includes: `copilot-sdk`, `chrome-devtools`, `excalidraw-diagram-generator`, `mcp-cli`, `microsoft-docs`, `microsoft-code-reference`, `microsoft-skill-creator`, `plantuml-ascii`, `prd`, `refactor`, `webapp-testing`
+Includes: `agentic-eval`, `chrome-devtools`, `copilot-sdk`, `make-skill-template`, `mcp-cli`, `microsoft-code-reference`, `microsoft-skill-creator`, `powershell-7`, `prd`, `refactor`, `webapp-testing`
 
 ## Tech Stack Coverage
 

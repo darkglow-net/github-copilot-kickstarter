@@ -7,10 +7,6 @@ description: 'Create new Agent Skills for GitHub Copilot from prompts or by dupl
 
 A meta-skill for creating new Agent Skills. Use this skill when you need to scaffold a new skill folder, generate a SKILL.md file, or help users understand the Agent Skills specification.
 
-> **Workspace-baseline context**: In this repository, root folders are authoritative and `.github/` is downstream.
-> When creating or updating skills here, keep canonical copies under `skills/`, keep `.github/skills/` tailored for this workspace,
-> and update the root `README.md` Skills table whenever the catalog changes.
-
 ## When to Use This Skill
 
 - User asks to "create a skill", "make a new skill", or "scaffold a skill"
@@ -25,13 +21,6 @@ A meta-skill for creating new Agent Skills. Use this skill when you need to scaf
 - Knowledge of any bundled resources needed (scripts, references, assets, templates)
 
 ## Creating a New Skill
-
-### Baseline Rule Check (Before You Start)
-
-- Keep canonical skill content in `skills/<name>/SKILL.md`
-- Keep `.github/skills/<name>/SKILL.md` as the workspace-tailored downstream copy
-- Avoid project-specific contamination in root templates unless the template is intentionally tech-specific
-- Update root `README.md` Skills section when adding/removing/renaming skills
 
 ### Step 1: Create the Skill Directory
 
@@ -132,7 +121,6 @@ my-awesome-skill/
    - Write a keyword-rich `description:`
    - Replace body content with your instructions
 4. Add bundled resources as needed
-5. Validate with `npm run skill:validate`
 
 ## Validation Checklist
 
