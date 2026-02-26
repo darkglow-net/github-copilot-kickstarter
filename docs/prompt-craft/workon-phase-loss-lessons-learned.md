@@ -2,7 +2,7 @@
 
 ## Context
 
-The `workon.spec` and `workon.myidea` orchestration prompts coordinate multi-phase development workflows through subagent delegation. After repeated use, a pattern emerged: **later phases (code review, validation, documentation) were consistently lost** during implementation iterations.
+The `workon.myspec` and `workon.myidea` orchestration prompts coordinate multi-phase development workflows through subagent delegation. After repeated use, a pattern emerged: **later phases (code review, validation, documentation) were consistently lost** during implementation iterations.
 
 This document captures the failure analysis and mitigation strategies applied in the February 2026 rewrite.
 
@@ -25,7 +25,7 @@ Adding more detail to phase 5-7 descriptions didn't help. The problem isn't that
 
 ### Approach 2: Persistent Progress Tracking (Worked)
 
-For `workon.spec`, we added a `PROGRESS.md` file in the spec directory that persists phase status to disk. Before every phase transition, the coordinator must read, verify, and update this file. This survived session boundaries and implementation context overload.
+For `workon.myspec`, we added a `PROGRESS.md` file in the spec directory that persists phase status to disk. Before every phase transition, the coordinator must read, verify, and update this file. This survived session boundaries and implementation context overload.
 
 ### Approach 3: Self-Check Instructions (Worked)
 
@@ -60,5 +60,5 @@ When delegating to the implement agent, the coordinator now states: *"You do not
 ## Related
 
 - [ADR-0001: Workon Prompt Rewrite](../adr/0001-workon-prompt-rewrite-phase-loss-mitigation.md)
-- [workon.spec prompt](../../prompts/workon.spec.prompt.md) (root template)
+- [workon.myspec prompt](../../prompts/workon.myspec.prompt.md) (root template)
 - [workon.myidea prompt](../../prompts/workon.myidea.prompt.md) (root template)

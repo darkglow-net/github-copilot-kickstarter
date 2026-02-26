@@ -8,7 +8,7 @@ Contributing guidelines, iteration workflows, and housekeeping for the workspace
 |-------|-------------|
 | Iteration logs | Notes from each improvement pass on the template library |
 | Housekeeping | Cleanup tasks, frontmatter audits, naming convention sweeps |
-| Workflows | How `workon.myidea` and `workon.spec` drive development in this repo |
+| Workflows | How `workon.myidea` and `workon.myspec` drive development in this repo |
 
 ## Navigation
 

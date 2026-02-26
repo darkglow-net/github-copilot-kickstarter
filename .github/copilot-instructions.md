@@ -35,7 +35,7 @@ When creating or modifying templates in this baseline:
 | Instructions | `{technology}.instructions.md` | `powershell-pester-5.instructions.md` |
 | Instructions (testing) | `tests-{framework}.instructions.md` | `tests-pester.instructions.md` |
 | Agents | `{purpose}.agent.md` | `tdd-red.agent.md` |
-| Prompts | `{workflow}.prompt.md` | `workon.spec.prompt.md` |
+| Prompts | `{workflow}.prompt.md` | `workon.myspec.prompt.md` |
 | Skills | `{name}/SKILL.md` | `copilot-sdk/SKILL.md` |
 
 ### Quality Checklist

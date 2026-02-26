@@ -14,7 +14,7 @@ Accepted
 
 ## Context
 
-The `workon.spec.prompt.md` and `workon.myidea.prompt.md` orchestration prompts coordinate multi-phase development workflows using subagent delegation. Both suffered from a recurring failure: **later phases (code review, validation, documentation) were consistently lost** as the coordinator's todo list was overwritten during implementation iterations.
+The `workon.myspec.prompt.md` and `workon.myidea.prompt.md` orchestration prompts coordinate multi-phase development workflows using subagent delegation. Both suffered from a recurring failure: **later phases (code review, validation, documentation) were consistently lost** as the coordinator's todo list was overwritten during implementation iterations.
 
 Root cause analysis identified 12 failure modes:
 
@@ -31,7 +31,7 @@ Rewrite both prompts with the following mitigations:
 
 ### 1. Phase Transition Protocol
 
-Every phase change requires reading and updating a progress tracker before proceeding. For `workon.spec`, this is a persistent `PROGRESS.md` file in the spec directory. For `workon.myidea`, this is a reinforced todo list with self-check instructions.
+Every phase change requires reading and updating a progress tracker before proceeding. For `workon.myspec`, this is a persistent `PROGRESS.md` file in the spec directory. For `workon.myidea`, this is a reinforced todo list with self-check instructions.
 
 ### 2. Fixed Todo List Structure
 
@@ -73,7 +73,7 @@ Phase 4 delegation to the implement agent now includes an explicit statement tha
 
 ### Negative
 
-- Prompts are significantly longer (workon.spec: 201 → 364 lines baseline, 425 tailored; workon.myidea: 130 → 199 baseline, 256 tailored)
+- Prompts are significantly longer (workon.myspec: 201 → 364 lines baseline, 425 tailored; workon.myidea: 130 → 199 baseline, 256 tailored)
 - PROGRESS.md adds a file artifact per spec feature that must be cleaned up
 - The 2-iteration review cap may occasionally require manual intervention for legitimately complex fixes
 
@@ -86,7 +86,7 @@ Phase 4 delegation to the implement agent now includes an explicit statement tha
 
 | File | Change |
 | ---- | ------ |
-| `prompts/workon.spec.prompt.md` | Rewritten as portable template (364 lines) |
+| `prompts/workon.myspec.prompt.md` | Rewritten as portable template (364 lines) |
 | `prompts/workon.myidea.prompt.md` | Rewritten as portable template (199 lines) |
-| `.github/prompts/workon.spec.prompt.md` | Rewritten as workspace-tailored version (425 lines) |
+| `.github/prompts/workon.myspec.prompt.md` | Rewritten as workspace-tailored version (425 lines) |
 | `.github/prompts/workon.myidea.prompt.md` | Rewritten as workspace-tailored version (256 lines) |

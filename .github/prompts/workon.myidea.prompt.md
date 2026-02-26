@@ -1,6 +1,6 @@
 ---
 agent: "agent"
-description: "Structured workflow for bug fixes, small features, and refactors. Routes large features to workon.spec.prompt.md."
+description: "Structured workflow for bug fixes, small features, and refactors. Routes large features to workon.myspec.prompt.md."
 ---
 
 # Work On My Idea
@@ -92,12 +92,12 @@ Score the work to determine the correct workflow. Start at 0 and **sum all appli
 | Score | Workflow | Action |
 |-------|----------|--------|
 | **0-3** | This prompt (lightweight) | Continue to Initialize State |
-| **4-7** | `workon.spec` (standard) | Report score and rationale. Instruct user to reinvoke with `workon.spec.prompt.md`. **EXIT** |
-| **8+** | `workon.spec` (extended) | Report score. Recommend spec workflow with security review. **EXIT** |
+| **4-7** | `workon.myspec` (standard) | Report score and rationale. Instruct user to reinvoke with `workon.myspec.prompt.md`. **EXIT** |
+| **8+** | `workon.myspec` (extended) | Report score. Recommend spec workflow with security review. **EXIT** |
 
 Confirm routing decision with user before proceeding.
 
-> **Note**: Complexity score is an estimate. After Phase 1 research, re-score if the estimate changed significantly. If the new score ≥ 4, offer to upgrade to `workon.spec.prompt.md`.
+> **Note**: Complexity score is an estimate. After Phase 1 research, re-score if the estimate changed significantly. If the new score ≥ 4, offer to upgrade to `workon.myspec.prompt.md`.
 
 ### Initialize State
 
@@ -309,7 +309,7 @@ If post-phase validation fails, report specific failures via Decision Presentati
 
 **Update PROGRESS.json**: Populate `context.affectedFiles` and `context.researchNotes`.
 
-**Re-score complexity**: If research revealed significantly more scope (score delta ≥ 2 or new score ≥ 4), present the updated score via Decision Presentation. Options: continue with this prompt, upgrade to `workon.spec.prompt.md`.
+**Re-score complexity**: If research revealed significantly more scope (score delta ≥ 2 or new score ≥ 4), present the updated score via Decision Presentation. Options: continue with this prompt, upgrade to `workon.myspec.prompt.md`.
 
 Execute Phase Transition Protocol.
 

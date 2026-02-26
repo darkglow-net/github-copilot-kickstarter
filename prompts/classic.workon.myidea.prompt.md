@@ -1,6 +1,6 @@
 ---
 agent: "agent"
-description: "Structured workflow for bug fixes, small features, and refactors. Routes large features to workon.spec.prompt.md."
+description: "Structured workflow for bug fixes, small features, and refactors. Routes large features to workon.myspec.prompt.md."
 ---
 
 ## Objective
@@ -50,7 +50,7 @@ Customize this section for your workspace.
 2. If spec exists: Note spec number, proceed to Phase 1 (use spec as contract)
 3. If NO spec exists: **HAND OFF TO USER**:
    - Report: "This work requires specification-driven workflow"
-   - Instruct: "Please reinvoke with `workon.spec.prompt.md` to create specification"
+   - Instruct: "Please reinvoke with `workon.myspec.prompt.md` to create specification"
    - **EXIT this prompt** (user chooses spec workflow)
 
 **If NO (non-spec work)**:

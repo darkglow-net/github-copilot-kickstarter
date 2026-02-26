@@ -2,7 +2,7 @@
 
 **Status**: Complete
 **Date**: 2026-02-24
-**Scope**: Exhaustive research (broad survey + deep dive) for improving `workon.myidea.prompt.md` and `workon.spec.prompt.md`
+**Scope**: Exhaustive research (broad survey + deep dive) for improving `workon.myidea.prompt.md` and `workon.myspec.prompt.md`
 **Pain Points Under Investigation**: Context drift mid-workflow, SpecKit coupling
 
 ---
@@ -94,7 +94,7 @@ Phase-detect → Delegate via runSubagent → Track state in plan.yaml → Summa
 4. Giving up after one failure (RUG means repeat)
 5. "I'll write just the orchestration logic myself" (that's implementation)
 
-**Relevance to our prompts**: ★★★★★ — The validation-subagent pattern and anti-laziness prompting are directly adoptable. The pure-orchestrator philosophy is a strong argument for our workon.spec to delegate more aggressively. The prompt template structure is more rigorous than our current delegation format.
+**Relevance to our prompts**: ★★★★★ — The validation-subagent pattern and anti-laziness prompting are directly adoptable. The pure-orchestrator philosophy is a strong argument for our workon.myspec to delegate more aggressively. The prompt template structure is more rigorous than our current delegation format.
 
 ---
 
@@ -477,8 +477,8 @@ Cross-layer changes: +2
 Architecture decisions: +3
 
 Score 0-3  → workon.myidea (lightweight)
-Score 4-7  → workon.spec (standard ceremony)
-Score 8+   → workon.spec (extended: add security review, performance review)
+Score 4-7  → workon.myspec (standard ceremony)
+Score 8+   → workon.myspec (extended: add security review, performance review)
 ```
 
 **Workflow Classification** (from Blueprint Mode):
@@ -671,12 +671,12 @@ Decisions made during research review, to be implemented in subsequent prompt re
 **Impact**: workon.myidea gains a state file it didn't have before. Phase Transition Protocol becomes read→execute→write→display for both prompts.
 
 ### D2: Adopt GitHub Spec Kit
-**Decision**: Replace semi-abandoned SpecKit agents with GitHub Spec Kit commands (/specify, /plan, /tasks). Our workon.spec.prompt.md becomes the orchestrator coordinating Spec Kit.
+**Decision**: Replace semi-abandoned SpecKit agents with GitHub Spec Kit commands (/specify, /plan, /tasks). Our workon.myspec.prompt.md becomes the orchestrator coordinating Spec Kit.
 **Rationale**: GitHub-official, 17+ AI tool support, active maintenance, Constitution pattern for architectural consistency. Our orchestrator adds phase tracking, quality gates, and documentation management that Spec Kit doesn't include.
 **Impact**: Spec Kit handles artifact generation; our orchestrator handles coordination, state tracking, review, validation, and documentation. Decouples from custom speckit.* agents.
 
 ### D3: Delegation Strategy — Status Quo + Templates
-**Decision**: workon.spec stays pure orchestrator (delegates everything). workon.myidea stays hybrid (executes simple phases directly, delegates complex ones). Both adopt standardized RUG-style delegation templates.
+**Decision**: workon.myspec stays pure orchestrator (delegates everything). workon.myidea stays hybrid (executes simple phases directly, delegates complex ones). Both adopt standardized RUG-style delegation templates.
 **Rationale**: The pure-orchestrator model preserves context window for the spec workflow's longer lifecycle. The hybrid model is more efficient for myidea's shorter, simpler workflows. Standardized templates ensure consistent delegation quality.
 **Impact**: Add RUG prompt template (CONTEXT, SCOPE, REQUIREMENTS, ACCEPTANCE CRITERIA, CONSTRAINTS, WHEN DONE) and anti-laziness addendum to all delegation instructions.
 
