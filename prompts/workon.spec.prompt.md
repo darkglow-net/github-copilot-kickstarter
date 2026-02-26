@@ -28,6 +28,7 @@ Customize this section for your workspace. The workflow references these setting
 | Specification | `speckit.specify` | Creates spec + branch via `.specify/` scripts |
 | Planning | `speckit.plan` | Generates design artifacts (plan.md, research.md, data-model.md) |
 | Task Generation | `speckit.tasks` | Breaks plan into dependency-ordered tasks |
+| Artifact Analysis | `speckit.analyze` | Cross-artifact consistency and coverage analysis (read-only) |
 | Implementation | `speckit.implement` | Executes task plan phase-by-phase |
 | Code Review | `code-review` | Fresh-context validation and compliance check |
 
@@ -134,17 +135,18 @@ Confirm user wants full specification workflow before proceeding.
 
 ### Initialize Todo Display
 
-Initialize `manage_todo_list` with all 8 phases. PROGRESS.json does not exist yet — it is created after Phase 2 (Specification). Until then, `manage_todo_list` is the temporary display mechanism.
+Initialize `manage_todo_list` with all 9 phases. PROGRESS.json does not exist yet — it is created after Phase 2 (Specification). Until then, `manage_todo_list` is the temporary display mechanism.
 
 ```javascript
 { id: 1, title: "Phase 1: Research",       status: "in-progress" },
 { id: 2, title: "Phase 2: Specification",  status: "not-started" },
 { id: 3, title: "Phase 3a: Plan",          status: "not-started" },
 { id: 4, title: "Phase 3b: Tasks",         status: "not-started" },
-{ id: 5, title: "Phase 4: Implement",      status: "not-started" },
-{ id: 6, title: "Phase 5: Code Review",    status: "not-started" },
-{ id: 7, title: "Phase 6: Validate",       status: "not-started" },
-{ id: 8, title: "Phase 7: Document",       status: "not-started" }
+{ id: 5, title: "Phase 3c: Analyze",       status: "not-started" },
+{ id: 6, title: "Phase 4: Implement",      status: "not-started" },
+{ id: 7, title: "Phase 5: Code Review",    status: "not-started" },
+{ id: 8, title: "Phase 6: Validate",       status: "not-started" },
+{ id: 9, title: "Phase 7: Document",       status: "not-started" }
 ```
 
 ---
@@ -171,6 +173,7 @@ Initialize `manage_todo_list` with all 8 phases. PROGRESS.json does not exist ye
     "specification": { "status": "completed", "startedAt": "{ISO-8601}", "completedAt": "{ISO-8601}", "summary": "spec.md created" },
     "plan":          { "status": "not-started", "startedAt": null, "completedAt": null, "summary": null },
     "tasks":         { "status": "not-started", "startedAt": null, "completedAt": null, "summary": null },
+    "analyze":       { "status": "not-started", "startedAt": null, "completedAt": null, "summary": null, "findings": { "critical": 0, "high": 0, "medium": 0, "low": 0 }, "autoResolved": 0, "userResolved": 0 },
     "implement":     { "status": "not-started", "startedAt": null, "completedAt": null, "summary": null },
     "review":        { "status": "not-started", "startedAt": null, "completedAt": null, "summary": null, "attempts": 0, "maxAttempts": 2, "findings": [], "rubricScores": null },
     "validate":      { "status": "not-started", "startedAt": null, "completedAt": null, "summary": null },
@@ -225,11 +228,12 @@ Map PROGRESS.json to the todo list:
 { id: 2, title: "Phase 2: Specification",  status: phases.specification.status },
 { id: 3, title: "Phase 3a: Plan",          status: phases.plan.status },
 { id: 4, title: "Phase 3b: Tasks",         status: phases.tasks.status },
-{ id: 5, title: "Phase 4: Implement",      status: phases.implement.status },
-{ id: 6, title: "Phase 5: Code Review",    status: phases.review.status },
+{ id: 5, title: "Phase 3c: Analyze",       status: phases.analyze.status },
+{ id: 6, title: "Phase 4: Implement",      status: phases.implement.status },
+{ id: 7, title: "Phase 5: Code Review",    status: phases.review.status },
 // Dynamic tasks from PROGRESS.json tasks[] — IDs 100+
-{ id: 7, title: "Phase 6: Validate",       status: phases.validate.status },
-{ id: 8, title: "Phase 7: Document",       status: phases.document.status }
+{ id: 8, title: "Phase 6: Validate",       status: phases.validate.status },
+{ id: 9, title: "Phase 7: Document",       status: phases.document.status }
 ```
 
 ---
@@ -369,7 +373,16 @@ Append Anti-Laziness Addendum.
 
 1. Verify branch: `git branch --show-current` — HALT if not on feature branch
 2. Verify spec file exists and contains complete specification
-3. **Create PROGRESS.json** in the spec directory (see State Management → Schema)
+3. **Resolve clarifications**: Scan spec.md for `[NEEDS CLARIFICATION` markers
+   - **If markers found**: Use the `ask_questions` tool to present each clarification to the user in a single call (batch up to 4 questions per call):
+     - Extract the specific question text from inside each `[NEEDS CLARIFICATION: ...]` marker
+     - Provide 2–3 suggested answers as options per question, derived from Phase 1 research context, domain conventions, or reasonable defaults
+     - Mark one option as `recommended` when the coordinator is confident it is the best choice — omit `recommended` when no option is clearly superior
+     - The `ask_questions` tool automatically shows a free-text "Other" option to users — do NOT add a custom/other option manually
+     - After the user responds, replace each `[NEEDS CLARIFICATION: ...]` marker in spec.md with the resolved answer, written as a definitive statement (not a question)
+     - Re-scan spec.md to confirm zero markers remain before proceeding
+   - **If no markers found**: Proceed silently to the next step
+4. **Create PROGRESS.json** in the spec directory (see State Management → Schema)
    - Mark `research` and `specification` as `"completed"` (retroactively)
    - Mark `plan` as `"in-progress"`
    - Populate `context` from Phase 1 research output
@@ -386,26 +399,20 @@ Execute Phase Transition Protocol.
 
 #### Delegation Prompt
 
+The plan agent defines its own phases, output files, and template workflow. The delegation provides instance context and lean anchors.
+
 ```markdown
 CONTEXT: The user asked: "[original request verbatim]"
 YOUR TASK: Generate implementation plan documents from the specification.
 SCOPE:
-- Spec file: {spec file path}
 - Feature directory: {spec directory}
 REQUIREMENTS:
-1. Generate plan.md with implementation approach, timeline, dependencies
-2. Generate research.md with technical findings and alternatives considered
-3. Generate data-model.md if specification mentions schema/data changes
-4. Generate quickstart.md for developer onboarding
+1. Generate plan artifacts (plan.md, research.md, data-model.md if applicable, quickstart.md)
 ACCEPTANCE CRITERIA:
-- [ ] plan.md exists with approach, timeline, and dependencies
-- [ ] research.md covers technology choices and alternatives
-- [ ] data-model.md exists if spec mentions schema changes
-- [ ] Documents are consistent with the specification
+- [ ] plan.md exists with substantive content
+- [ ] All documents are consistent with the specification
 CONSTRAINTS:
-- Do NOT modify the specification (spec.md)
-- Do NOT create implementation code
-- Do NOT create task breakdowns (that is the next phase)
+- Your scope ends after plan artifact generation. Task breakdowns and implementation are separate phases handled by the coordinator.
 WHEN DONE: Report: documents created, implementation approach summary, key technical decisions.
 ```
 
@@ -421,26 +428,22 @@ Execute Phase Transition Protocol.
 
 #### Delegation Prompt
 
+The tasks agent defines its own checklist format, phase structure, and organization rules. The delegation provides instance context, lean anchors, and activates test generation.
+
 ```markdown
 CONTEXT: The user asked: "[original request verbatim]"
 YOUR TASK: Break the implementation plan into dependency-ordered tasks.
 SCOPE:
 - Feature directory: {spec directory}
-- Design docs: {list: spec.md, plan.md, research.md, data-model.md, etc.}
 REQUIREMENTS:
-1. Generate tasks.md with checkbox task format ([ ] ID: title)
-2. Tasks must be dependency-ordered (no task depends on a later one)
-3. Each task must reference specific files to create or modify
-4. Include test tasks before their corresponding implementation tasks (test-first)
-5. {project-specific test requirements from Configuration → Project Rules}
+1. Generate tasks.md with dependency-ordered, executable tasks
+2. Tests ARE requested — generate test tasks before their corresponding implementation tasks (test-first)
+3. If Configuration → Project Rules defines additional test requirements, apply them
 ACCEPTANCE CRITERIA:
-- [ ] tasks.md exists with proper checkbox format
-- [ ] Every task has a unique ID, title, and file references
-- [ ] Tasks are ordered by dependency
+- [ ] tasks.md exists with proper checklist format and file paths
 - [ ] Test tasks precede implementation tasks
 CONSTRAINTS:
-- Do NOT implement any tasks
-- Do NOT modify spec or plan documents
+- Your scope ends after generating tasks.md. Implementation is a separate phase handled by the coordinator.
 WHEN DONE: Report: task count, dependency summary, estimated complexity.
 ```
 
@@ -452,33 +455,105 @@ Execute Phase Transition Protocol.
 
 ---
 
+## Phase 3c: Cross-Artifact Analysis
+
+**Delegate to**: `speckit.analyze` agent
+
+**Purpose**: Catch inconsistencies, coverage gaps, and ambiguities across spec.md, plan.md, and tasks.md **before** the expensive implementation phase.
+
+### Delegation Prompt
+
+```markdown
+CONTEXT: The user asked: "[original request verbatim]"
+YOUR TASK: Analyze the feature artifacts for consistency and coverage issues.
+SCOPE:
+- Feature directory: {spec directory}
+REQUIREMENTS:
+1. Run detection passes across spec.md, plan.md, and tasks.md
+2. Assign severity to every finding
+3. Produce the coverage summary and metrics
+ACCEPTANCE CRITERIA:
+- [ ] Findings table with severity, location, and recommendation per finding
+- [ ] Coverage summary maps requirements to tasks
+- [ ] Metrics section complete (coverage %, issue counts)
+CONSTRAINTS:
+- Your scope ends after producing the analysis report (through Step 7). The coordinator handles remediation triage and user interaction separately.
+WHEN DONE: Report: findings table, coverage summary, metrics, and recommended next actions.
+```
+
+Append Anti-Laziness Addendum.
+
+### Coordinator Post-Delegation: Triage Findings
+
+The coordinator processes the analysis report in three passes:
+
+#### Pass 1: Auto-resolve trivial findings
+
+Findings that have exactly one obvious fix require no user input. Apply them directly:
+
+- **Terminology drift**: Normalize to the canonical term used in spec.md
+- **Wrong file paths in tasks.md**: Correct to match actual project structure
+- **Unresolved placeholders** (TODO, TKTK, ???): Fill from spec/plan context if unambiguous
+- **Task ordering errors**: Reorder in tasks.md to satisfy stated dependencies
+- **Duplicate requirements**: Remove the lower-quality duplicate, keep the clearer version
+
+After applying auto-fixes, record count in PROGRESS.json `analyze.autoResolved`.
+
+#### Pass 2: Present decision-required findings to user
+
+Findings with multiple valid resolutions require user input. Use `ask_questions` to present them:
+
+- Batch up to 4 findings per `ask_questions` call
+- For each finding, extract the core decision from the analysis recommendation
+- Provide 2–3 resolution options derived from the analyze report's recommendations and the coordinator's Phase 1 research context
+- Mark one option as `recommended` when the coordinator is confident — omit when no option is clearly superior
+- The `ask_questions` tool automatically shows a free-text "Other" option — do NOT add one manually
+- After user responds, apply the chosen resolution to the affected artifact(s) (spec.md, plan.md, or tasks.md)
+- Record count in PROGRESS.json `analyze.userResolved`
+
+**Examples of decision-required findings**:
+- Conflicting requirements (e.g., spec says REST, plan says GraphQL) — user picks which
+- Missing non-functional coverage — user decides if it should be added to tasks or deferred
+- Ambiguous terms lacking measurable criteria — user provides the target metric
+
+#### Pass 3: Gate implementation
+
+After passes 1 and 2, evaluate remaining unresolved findings:
+
+| Remaining findings | Action |
+|--------------------|--------|
+| 0 CRITICAL, 0 HIGH | Proceed to Phase 4 |
+| 0 CRITICAL, 1+ HIGH | Report to user — user decides: fix or proceed |
+| 1+ CRITICAL | **HALT** — must resolve before implementation. Set `haltReason` in PROGRESS.json |
+
+Record final severity counts in PROGRESS.json `analyze.findings`.
+
+Execute Phase Transition Protocol.
+
+---
+
 ## Phase 4: Implementation
 
 **Delegate to**: `speckit.implement` agent
 
 ### Delegation Prompt
 
+The implement agent defines its own phase execution, progress tracking, and validation flow. The delegation provides instance context, lean anchors, and overrides.
+
 ```markdown
 CONTEXT: The user asked: "[original request verbatim]"
 YOUR TASK: Execute all tasks in the implementation plan.
 SCOPE:
-- Tasks file: {tasks.md path}
-- Design docs: {spec.md, plan.md, research.md, data-model.md paths}
-- Project rules: {from Configuration → Project Rules section}
+- Feature directory: {spec directory}
 REQUIREMENTS:
-1. Execute tasks in dependency order
-2. Write tests BEFORE implementation code (test-first)
-3. Mark each completed task [X] in tasks.md
-4. Use MCP tools for external library/API verification — do NOT rely on training data
+1. Tests ARE requested — write tests BEFORE implementation code (test-first)
+2. If Configuration → Project Rules defines additional requirements, apply them
+3. Use MCP tools for external library/API verification — do NOT rely on training data
 ACCEPTANCE CRITERIA:
 - [ ] All tasks in tasks.md marked [X]
-- [ ] Tests exist for all new functionality
-- [ ] All tests pass
-- [ ] No lint/compile errors in modified files
+- [ ] All tests pass and no lint/compile errors
 CONSTRAINTS:
-- Do NOT modify spec.md or plan.md
-- Do NOT proceed to code review — return to coordinator after implementation
-- After implementation, the coordinator proceeds to Phase 5 (Code Review), Phase 6 (Validate), and Phase 7 (Document). You do NOT manage these phases.
+- Your scope ends after task execution. Code review, validation, and documentation are separate phases handled by the coordinator.
 WHEN DONE: Report: files created/modified, test results summary, task completion status, issues encountered.
 ```
 
@@ -651,5 +726,6 @@ Documentation Updates:
 | Code review REJECTED (attempt ≤ 2) | Add fix tasks to PROGRESS.json, return to Phase 4 |
 | Code review REJECTED (attempt > 2) | **HALT** — escalate to user with full analysis |
 | Post-phase validation fails | Report failures. User decides next step |
+| Analyze finds CRITICAL issues | HALT — resolve before Phase 4. Auto-fix trivials, ask user for decisions |
 | Branch not on feature branch | HALT — resolve git state before continuing |
 | MCP tool unavailable | Use fallback from Configuration table. Note limitation to user |
