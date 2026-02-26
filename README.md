@@ -75,7 +75,7 @@ These are the home-grown workflow prompts that drive day-to-day development:
 |--------|--------|--------------|
 | **workon.myidea** | `/workon.myidea` | Structured workflow for bug fixes, small features, and refactors. Routes large work to `workon.myspec`. |
 | **workon.myspec** | `/workon.myspec` | Coordinator for spec-driven feature development. Depends on [SpecKit](https://github.com/github/spec-kit) agents and templates. |
-| **validate.myprompt** | `/validate.myprompt` | Dispatches three parallel specialist reviews ([critical-thinking](agents/critical-thinking.agent.md), [code-review](agents/code-review.agent.md), [prompt-builder](agents/prompt-builder.agent.md)) of a prompt file, then synthesizes a prioritized action plan. |
+| **validate.myprompt** | `/validate.myprompt` | Dispatches three parallel specialist reviews ([critical-thinking](agents/critical-thinking.agent.md), [code-review](agents/code-review.agent.md), [prompt-builder](agents/prompt-builder.agent.md)) of a workspace template file (`.prompt.md`, `.agent.md`, `.instructions.md`, `SKILL.md`), then synthesizes a prioritized action plan. |
 
 ---
 
@@ -110,7 +110,7 @@ Workflow starters invoked via `/prompt-name` in Copilot Chat.
 |--------|-------------|--------|
 | [workon.myidea](prompts/workon.myidea.prompt.md) | Structured workflow for bug fixes, small features, and refactors | [🏠](prompts/workon.myidea.prompt.md) |
 | [workon.myspec](prompts/workon.myspec.prompt.md) | Coordinator for spec-driven feature development. Depends on [SpecKit](https://github.com/github/spec-kit). | [🏠](prompts/workon.myspec.prompt.md) |
-| [validate.myprompt](prompts/validate.myprompt.prompt.md) | Parallel specialist review of a prompt file with synthesized action plan | [🏠](prompts/validate.myprompt.prompt.md) |
+| [validate.myprompt](prompts/validate.myprompt.prompt.md) | Parallel specialist review of a workspace template file with synthesized action plan | [🏠](prompts/validate.myprompt.prompt.md) |
 | [architecture-blueprint-generator](prompts/architecture-blueprint-generator.prompt.md) | Analyzes codebases to create detailed architectural documentation | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/architecture-blueprint-generator/SKILL.md) |
 | [copilot-instructions-blueprint-generator](prompts/copilot-instructions-blueprint-generator.prompt.md) | Scaffolds a copilot-instructions.md tailored to your tech stack | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/copilot-instructions-blueprint-generator/SKILL.md) |
 | [create-agentsmd](prompts/create-agentsmd.prompt.md) | Generates an AGENTS.md file for a repository | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/create-agentsmd/SKILL.md) |
