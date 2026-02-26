@@ -51,7 +51,7 @@ Customize this section for your workspace. The workflow references these setting
 
 | Action | Command | Notes |
 |--------|---------|-------|
-| Run tests | `Invoke-Build Test` | Replace with your test runner (e.g., `npm test`, `pytest`, `dotnet test`) |
+| Run tests | `<test-command>` | Replace with your test runner (e.g., `npm test`, `pytest`, `Invoke-Build Test`, `dotnet test`) |
 | Check errors | `get_errors` tool | Built-in Copilot tool — works in all workspaces |
 
 ### Project Paths (adjust to match your repo)

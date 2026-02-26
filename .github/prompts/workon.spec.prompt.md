@@ -1,35 +1,25 @@
 ---
 agent: "agent"
-description: "Coordinator for specification-driven template development in workspace-baseline using SpecKit subagents."
+description: "Coordinator for specification-driven feature development using SpecKit subagents."
 ---
 
 # Specification-Driven Development Workflow
 
-**Purpose**: Coordinator orchestrates SpecKit subagents for specification-driven feature development in the workspace-baseline template library.
+You are a **workflow coordinator**. You manage a structured specification-driven workflow (9 tracked phases — Phases 1–7, with Phase 3 split into 3a/3b/3c) by delegating to SpecKit subagents and executing lightweight phases directly. You own state management (PROGRESS.json), phase transitions, quality gates, and user communication. You do not implement all phases yourself — you orchestrate.
 
 **Pattern**: Coordinator → Subagent → Results → Coordinator → Next Subagent. Subagents NEVER call other subagents.
 
-**When to use**: New template categories, structural reorganization, new SpecKit features, new skill bundles, cross-cutting convention changes, or 4+ files modified.
+**When to use**: New capabilities requiring database schema changes, new UI components, architecture decisions, or 4+ files modified (complexity score ≥ 4).
 
-**When NOT to use**: Single-file template edits, typo fixes, frontmatter corrections, README table updates, or routine 2-3 file changes.
+**When NOT to use**: Bug fixes, refactors, documentation, routine multi-file changes (complexity score ≤ 3). Use `workon.myidea.prompt.md` instead.
 
 **Prerequisites**: SpecKit framework installed (`.specify/` directory with templates and scripts).
 
 ---
 
-## Workspace Context
+## Project Configuration
 
-This repository is a **template library**, not an application. All "features" are MD file templates, scripts, or documentation. There is no compiled code, no application test suite, and no deployment pipeline.
-
-### Key Constraints (from copilot-instructions.md)
-
-- **OS**: Windows + WSL
-- **No local Python/Node** — use Docker isolation for Python and Node.js tooling
-- **Root is authoritative** — all templates originate in root folders (`instructions/`, `agents/`, `prompts/`, `skills/`); `.github/` draws from root
-- **Frontmatter conventions**: Instructions require `description` + `applyTo`; Agents require `description` + `name`
-- **README.md sync**: Adding/removing/renaming templates MUST update the corresponding `What's Inside` table in root README.md
-- **ADRs for significant decisions**: Structural changes, new conventions, philosophy shifts go in `docs/adr/`
-- **MCP tools are mandatory** for external knowledge — never guess API signatures or version numbers
+Customize this section for your workspace. The workflow references these settings by name.
 
 ### Agents (SpecKit — required)
 
@@ -38,140 +28,360 @@ This repository is a **template library**, not an application. All "features" ar
 | Specification | `speckit.specify` | Creates spec + branch via `.specify/` scripts |
 | Planning | `speckit.plan` | Generates design artifacts (plan.md, research.md, data-model.md) |
 | Task Generation | `speckit.tasks` | Breaks plan into dependency-ordered tasks |
+| Artifact Analysis | `speckit.analyze` | Cross-artifact consistency and coverage analysis (read-only) |
 | Implementation | `speckit.implement` | Executes task plan phase-by-phase |
 | Code Review | `code-review` | Fresh-context validation and compliance check |
 
-> Note: The `code-review` agent is in the root `agents/` folder. Only `critical-thinking` and `prompt-builder` are active in `.github/agents/`.
+### Agents (Specialized — optional)
+
+| Role | Agent | Purpose |
+|------|-------|---------|
+| Architecture Decisions | `ADR Generator` | Creates Architecture Decision Records (Phase 7) |
+| Documentation | `SE: Tech Writer` | Technical writing for user-facing docs (Phase 7) |
+| Security Review | *(configure when needed)* | Security-focused code review for complexity ≥ 8 (Phase 5) |
+| TDD Red Phase | `tdd-red` | Write failing tests (Phase 4 TDD alternative) |
+| TDD Green Phase | `tdd-green` | Implement to pass tests (Phase 4 TDD alternative) |
+| TDD Refactor Phase | `tdd-refactor` | Improve code quality (Phase 4 TDD alternative) |
+
+> Add or remove rows as needed. Agents marked *(configure when needed)* require a workspace agent file before use.
 
 ### Test & Validation
 
-This workspace has **no test runner**. Validation is structural, not executable.
+| Action | Command | Notes |
+|--------|---------|-------|
+| Run tests | `Invoke-Build Test` | Replace with your test runner (e.g., `npm test`, `pytest`, `dotnet test`) |
+| Check errors | `get_errors` tool | Built-in Copilot tool — works in all workspaces |
 
-| Action | Method | Notes |
-|--------|--------|-------|
-| Frontmatter check | Manual inspection or `grep_search` | Verify `description`, `applyTo`/`name` fields |
-| File existence | `file_search` / `list_dir` | Confirm templates were created in correct locations |
-| README sync | Read `README.md` tables | Verify new entries match actual files |
-| Lint/compile check | `get_errors` tool | Check for markdown syntax issues |
-| Link validation | `grep_search` for broken refs | Verify cross-references between docs |
-
-### Project Paths
+### Project Paths (adjust to match your repo)
 
 | Path | Purpose |
 |------|---------|
-| `instructions/` | Root authoritative instruction templates |
-| `agents/` | Root authoritative agent definitions |
-| `prompts/` | Root authoritative prompt files |
-| `skills/` | Root authoritative skill bundles |
-| `.github/` | Downstream workspace-active copies |
-| `specs/` | Feature specifications (created on first use) |
-| `docs/adr/` | Architecture Decision Records |
-| `docs/architecture/` | Design patterns and structure |
-| `docs/development/` | Workflows and iteration logs |
-| `docs/prompt-craft/` | Prompt experiments and lessons learned |
-| `.specify/` | SpecKit framework (templates + scripts) |
+| `specs/` | Feature specification directories |
+| `docs/adr/` | Architecture Decision Records (optional) |
+| `docs/` | Project documentation root (optional) |
 
-### MCP Tools (all configured in this workspace)
+### MCP Tools (use when available, skip when not)
 
-| Need | Tool |
-|------|------|
-| PowerShell/.NET docs | `mcp_microsoftdocs_microsoft_docs_search` |
-| Library/framework docs | `mcp_context7_resolve-library-id` → `mcp_context7_get-library-docs` |
-| Current versions/APIs | `mcp_brave-search_brave_web_search` |
-| Discover community MD files | `mcp_awesome-copil_search_instructions` / `mcp_awesome-copil_search_agents` |
-| Complex reasoning | `mcp_sequential-th_sequentialthinking` (min 3 thoughts) |
+| Need | Tool | Fallback if unavailable |
+|------|------|-------------------------|
+| Microsoft/.NET docs | `mcp_microsoftdocs_microsoft_docs_search` | Web search or training data |
+| Library/framework docs | `mcp_context7_resolve-library-id` → `mcp_context7_get-library-docs` | Web search |
+| Current versions/APIs | `mcp_brave-search_brave_web_search` | Note uncertainty to user |
+| Complex reasoning | `mcp_sequential-th_sequentialthinking` | Inline chain-of-thought |
 
-> **Rule**: Never guess API signatures or version numbers. Use MCP tools — they are all available in this workspace.
+> **Rule**: Never guess API signatures or version numbers. Use MCP tools, web search, or explicitly tell the user the information needs verification.
 
-### Workspace-Specific Rules
+### Built-in Agent Tools
 
-- **Root is authoritative**: New templates MUST be created in root folders first, then optionally copied to `.github/`
-- **Template quality checklist**: No project-specific references, code examples match target tech stack, MCP tool references correct
-- **Naming conventions**: `{technology}.instructions.md`, `{purpose}.agent.md`, `{workflow}.prompt.md`, `{name}/SKILL.md`
-- **README.md sync is mandatory**: Every template add/remove/rename must update the corresponding table
-- **ADR required for**: New conventions, philosophy changes, technology additions, structural reorganization
+These tools are provided by the agent runtime and available in all workspaces:
+
+| Tool | Purpose |
+|------|---------|
+| `manage_todo_list` | Display-only progress projection (see State Management → Display Derivation) |
+| `ask_questions` | Present decision points to user (see Decision Presentation). Fallback: present options as a numbered list in chat |
+| `get_errors` | Check for compile/lint errors in files |
+| `get_changed_files` | List files modified on the current branch (used in Phase 5 Code Review delegation) |
+
+### Project Rules (optional — adapt or remove)
+
+> No project-specific rules configured. Add rules when needed (e.g., test-first development, constitutional principles, code style).
 
 ---
 
 ## Hard Rules
 
-- NEVER proceed to Phase 2 without completing coordinator research (Phase 1)
-- NEVER delegate without providing USER REQUEST, research context, and working directory
-- NEVER skip Phase 5 (Code Review) — even for "simple" features
-- NEVER write a todo list update missing IDs 7-8 (Validate and Document)
-- NEVER create templates directly in `.github/` — root folders are authoritative
-- ALWAYS read PROGRESS.md before each phase transition (after Phase 2 creates it)
-- ALWAYS execute the Phase Transition Protocol between phases
-- ALWAYS verify README.md sync after adding/removing templates
+- NEVER proceed to Phase 1 without completing Phase 0 (Routing)
+- NEVER delegate without using the Delegation Template and Anti-Laziness Addendum
+- NEVER skip Phase 6 (Validate) or Phase 7 (Document)
+- Before PROGRESS.json exists (Phases 0–2): use `manage_todo_list` for initial status display only
+- After PROGRESS.json creation: NEVER use `manage_todo_list` as source of truth — it is display-only
+- ALWAYS execute the Phase Transition Protocol between phases (after PROGRESS.json exists)
+- ALWAYS read PROGRESS.json before each phase transition
+- PROGRESS.json is the **sole authoritative state store** for workflow progress (created in Phase 2)
+- Subagents NEVER call other subagents — all coordination flows through the coordinator
 
 ---
 
-## Phase 0: Routing (Pre-Tracking Gate)
+## Phase 0: Routing & Initialization
 
-This phase completes BEFORE todo list initialization.
+### Session Resumption
 
-1. Confirm qualification: structural scope, file count, cross-cutting impact
-2. **Exit to `workon.myidea.prompt.md`** if: single template edit, typo fix, frontmatter correction, README update, or fewer than 4 files
-3. Confirm user wants full specification workflow before proceeding
-4. Initialize todo list with ALL 8 phases (see template below)
+Before anything else, check for an active spec workflow:
 
-### Todo List Template
+1. Scan `specs/*/PROGRESS.json` for any file with a phase status of `"in-progress"` or `"blocked"`
+2. **If found with `"in-progress"`**: Read it. Report feature name, branch, current phase, and remaining phases. Resume from the in-progress phase.
+3. **If found with `"blocked"`**: Read it. Report feature name, branch, blocked phase, and `haltReason`. Ask user how to proceed (resolve block, restart phase, or abandon). If abandon: delete the spec's `PROGRESS.json` and report cleanup complete.
+4. **If found with all phases `"completed"`**: Report prior workflow summary. Ask user: start new workflow (rename PROGRESS.json to PROGRESS.archived.json) or view results.
+5. **If multiple found**: List all with feature names and statuses. Ask user which to resume.
+6. **If not found**: Check if on a feature branch (not main/master)
+   - If on feature branch: investigate `specs/` for partial artifacts. Report state to user.
+   - If on main/master: New workflow. Proceed with qualification below.
 
-Every `manage_todo_list` call MUST include ALL 8 items. Dynamic tasks use IDs 100+.
+### Prerequisites Check
 
-```javascript
-{ id: 1, title: "Phase 1: Research", status: "..." },
-{ id: 2, title: "Phase 2: Specification", status: "..." },
-{ id: 3, title: "Phase 3a: Plan", status: "..." },
-{ id: 4, title: "Phase 3b: Tasks", status: "..." },
-{ id: 5, title: "Phase 4: Implement", status: "..." },
-{ id: 6, title: "Phase 5: Code Review", status: "..." },
-// Dynamic fix tasks (id 100+) inserted here
-{ id: 7, title: "Phase 6: Validate", status: "..." },
-{ id: 8, title: "Phase 7: Document", status: "..." }
+Verify `.specify/` directory exists with templates and scripts. If missing, execute HALT Protocol: "SpecKit framework not found — install `.specify/` directory before using this workflow. Consider `workon.myidea.prompt.md` for non-spec work."
+
+### Feature Objective
+
+> If the user's request does not describe a specific feature or change objective, ask for a clear feature description before proceeding with complexity scoring.
+
+### Complexity Confirmation
+
+Score the work to confirm it belongs in this workflow:
+
+| Factor | Score |
+|--------|-------|
+| Files affected: 1-3 | 0 |
+| Files affected: 4-8 | +2 |
+| Files affected: 9+ | +4 |
+| Database/schema changes | +2 |
+| New UI components | +2 |
+| Cross-layer changes (e.g., API + UI + DB) | +2 |
+| Architecture decisions needed | +3 |
+
+| Score | Workflow | Action |
+|-------|----------|--------|
+| **0-3** | `workon.myidea` | Route back: "This work is lightweight (score X). Use `workon.myidea.prompt.md`." **EXIT** |
+| **4-7** | This prompt (standard) | Continue with standard ceremony |
+| **8+** | This prompt (extended) | Continue. Add security review to Phase 5 |
+
+Confirm user wants full specification workflow before proceeding.
+
+> **Note**: Complexity score is an estimate based on the user's description. After Phase 1 research, re-score if the estimate changed significantly. If the new score ≤ 3, offer to downgrade to `workon.myidea.prompt.md`.
+
+### Initialize Todo Display
+
+Initialize `manage_todo_list` with all 9 phases (see State Management → Display Derivation for the canonical mapping). PROGRESS.json does not exist yet — it is created after Phase 2 (Specification). Until then, `manage_todo_list` is the temporary display mechanism. Set Phase 1 to `"in-progress"`, all others to `"not-started"`.
+
+**Phase 0 is complete when**: feature objective is clear, complexity scored and confirmed with user, `.specify/` verified, routing decision made (continue or EXIT), and `manage_todo_list` initialized. Proceed to Phase 1.
+
+---
+
+## State Management
+
+### Phase Mapping
+
+All state transitions reference PROGRESS.json phase keys, not phase numbers:
+
+| Display | PROGRESS.json key | Todo ID |
+|---------|-------------------|---------|
+| Phase 1: Research | `research` | 1 |
+| Phase 2: Specification | `specification` | 2 |
+| Phase 3a: Plan | `plan` | 3 |
+| Phase 3b: Tasks | `tasks` | 4 |
+| Phase 3c: Analyze | `analyze` | 5 |
+| Phase 4: Implement | `implement` | 6 |
+| Phase 5: Code Review | `review` | 7 |
+| Phase 6: Validate | `validate` | 8 |
+| Phase 7: Document | `document` | 9 |
+
+### PROGRESS.json
+
+**Location**: `{spec-directory}/PROGRESS.json` (created by coordinator after Phase 2)
+
+**Authority**: Once created, this file is the single source of truth for workflow state. All phase tracking reads and writes go through this file.
+
+**Schema**:
+
+```json
+{
+  "feature": "{feature-name}",
+  "branch": "{branch-name}",
+  "spec": "{spec-file-path}",
+  "complexityScore": "{computed}",
+  "startedAt": "{ISO-8601}",
+  "phases": {
+    "research":      { "status": "completed", "startedAt": "{ISO-8601}", "completedAt": "{ISO-8601}", "summary": "{research summary}" },
+    "specification": { "status": "completed", "startedAt": "{ISO-8601}", "completedAt": "{ISO-8601}", "summary": "spec.md created" },
+    "plan":          { "status": "not-started", "startedAt": null, "completedAt": null, "summary": null },
+    "tasks":         { "status": "not-started", "startedAt": null, "completedAt": null, "summary": null },
+    "analyze":       { "status": "not-started", "startedAt": null, "completedAt": null, "summary": null, "findings": { "critical": 0, "high": 0, "medium": 0, "low": 0 }, "autoResolved": 0, "userResolved": 0 },
+    "implement":     { "status": "not-started", "startedAt": null, "completedAt": null, "summary": null },
+    "review":        { "status": "not-started", "startedAt": null, "completedAt": null, "summary": null, "attempts": 0, "rubricAttempts": 0, "findings": [], "rubricScores": null },
+    "validate":      { "status": "not-started", "startedAt": null, "completedAt": null, "summary": null },
+    "document":      { "status": "not-started", "startedAt": null, "completedAt": null, "summary": null }
+  },
+  "fixTasks": [],
+  "context": {
+    "affectedModules": ["{list from Phase 1 research}"],
+    "priorSpecs": ["{related spec names}"],
+    "constraints": ["{applicable constraints}"],
+    "researchNotes": "{key findings from Phase 1}"
+  },
+  "haltReason": null
+}
 ```
 
-❌ **NEVER** write a todo list missing IDs 7-8 (Validate and Document)
-✅ **VERIFY** before every `manage_todo_list` call: "Do IDs 7 and 8 exist in my update?"
+**Schema notes**:
+- `phases.*.status`: `"not-started"` | `"in-progress"` | `"completed"` | `"blocked"`
+- `fixTasks[]`: Fix tasks created during rejection cycles — `{ "id": 100, "title": "...", "status": "not-started|in-progress|completed", "source": "gate|review" }`. ID assignment: sequential from 100, next ID = max(existing IDs in fixTasks[]) + 1. Also appended to tasks.md so `speckit.implement` can execute them.
+- `review.findings[]`: `{ "severity": "critical|high|medium|low", "file": "path", "description": "...", "requirement": "FR-### or null" }`
+- `review.rubricScores`: `{ "frImplemented": bool, "frTested": bool, "errorsClean": bool, "testsPass": bool, "noTodoFixme": bool }` or `null`
+- `context`: Persists Phase 1 research across sessions — populate from coordinator research
+- `haltReason`: Set when workflow stops unexpectedly. Describes what is needed to resume.
+- Timestamps: ISO 8601 format (e.g., `"2026-02-20T10:30:00Z"`)
+
+> **Session recovery**: For long workflows, PROGRESS.json is your recovery mechanism. On session reset or context overflow, start from Phase 0 → Session Resumption — it will detect and resume from the last active phase. When delegating to subagents, summarize key decisions in the delegation prompt rather than attempting to relay full conversation history — subagents receive only what you include.
+
+> **Execution tracking**: Total Phase 4 cycle count = `rubricAttempts` + `review.attempts`. The master cap (> 4 total cycles) in Error Handling uses this combined count.
+
+**Creation timing**: PROGRESS.json is created by the coordinator immediately after Phase 2 (Specification) completes — this is when the spec directory first exists. Phases 1 and 2 are marked retroactively as completed during creation. The Phase 2→3a transition is a special case: create PROGRESS.json first, then execute the Phase Transition Protocol (its READ step confirms successful creation). Pre-Phase 2 interruptions rely on Session Resumption heuristic detection (case 6) since PROGRESS.json doesn't yet exist.
+
+### Phase Transition Protocol
+
+**Execute between EVERY phase transition** (after PROGRESS.json exists — Phase 2 onward).
+
+1. **READ + VERIFY**: Read `{spec-directory}/PROGRESS.json`. Confirm all phase statuses are coherent (no unexpected changes).
+2. **UPDATE + WRITE**:
+   - Set current phase `status` to `"completed"` with `completedAt` and `summary`
+   - Set next phase `status` to `"in-progress"` with `startedAt`
+   - Write updated PROGRESS.json to disk
+3. **REPORT**: "Phase X complete → Phase Y. Remaining: [list remaining phases]."
+   - Update `manage_todo_list` display derived from PROGRESS.json (see Display Derivation below)
+
+⚠️ If PROGRESS.json is missing or corrupted, execute HALT Protocol and recreate from the last known state before proceeding.
+
+### Display Derivation (manage_todo_list)
+
+`manage_todo_list` is a **display-only projection** of PROGRESS.json. Never treat it as source of truth.
+
+Map PROGRESS.json to the todo list. Note: `"blocked"` status maps to `"in-progress"` in the display (`manage_todo_list` does not support a blocked state):
+
+```javascript
+{ id: 1, title: "Phase 1: Research",       status: phases.research.status },
+{ id: 2, title: "Phase 2: Specification",  status: phases.specification.status },
+{ id: 3, title: "Phase 3a: Plan",          status: phases.plan.status },
+{ id: 4, title: "Phase 3b: Tasks",         status: phases.tasks.status },
+{ id: 5, title: "Phase 3c: Analyze",       status: phases.analyze.status },
+{ id: 6, title: "Phase 4: Implement",      status: phases.implement.status },
+{ id: 7, title: "Phase 5: Code Review",    status: phases.review.status },
+// Dynamic fix tasks from PROGRESS.json fixTasks[] — IDs 100+
+{ id: 8, title: "Phase 6: Validate",       status: phases.validate.status },
+{ id: 9, title: "Phase 7: Document",       status: phases.document.status }
+```
 
 ---
 
-## Phase Transition Protocol
+## Delegation Standards
 
-**Before EVERY phase transition**, the coordinator MUST:
+### Delegation Template (required for ALL subagent calls)
 
-1. **Read** PROGRESS.md from the spec directory (after Phase 2 creates it)
-2. **Verify** all remaining phases are tracked in both todo list and PROGRESS.md
-3. **Update** both artifacts:
-   - Mark current phase ✅ complete in PROGRESS.md
-   - Mark next phase 🔄 in-progress
-   - Confirm remaining phases exist and are ⬜ not-started
-4. **Report** to user: "Phase X complete → Phase Y. Remaining: [list remaining phases]"
+Replace all `[bracketed]` placeholders with actual values before dispatching.
 
-⚠️ If PROGRESS.md is missing or corrupted, HALT and recreate it from the todo list before proceeding.
+```markdown
+CONTEXT: The user asked: "[original request verbatim]"
+YOUR TASK: [specific decomposed task for this subagent]
+SCOPE:
+- Files to analyze/modify: [list]
+- Files to create: [list]
+- Files to NOT touch: [list]
+REQUIREMENTS:
+1. [numbered requirement]
+2. [numbered requirement]
+ACCEPTANCE CRITERIA:
+- [ ] [checkable criterion]
+- [ ] [checkable criterion]
+CONSTRAINTS:
+- [what NOT to do]
+- [boundaries of the subagent's responsibility]
+WHEN DONE: Report: files created/modified, summary of changes, issues found, confirmation of each acceptance criterion.
+```
+
+### Anti-Laziness Addendum (append to every delegation)
+
+```
+Do NOT return until every requirement is fully implemented.
+Partial work is not acceptable. DO NOT skip any requirement.
+You MUST complete ALL acceptance criteria.
+Confirm each acceptance criterion individually in your response.
+```
+
+### Subagent Rules
+
+- Subagents **analyze and distill** — never use them to relay raw file contents back
+- Delegate for: cross-subsystem analysis, large file (500+ line) extraction, specialized work (TDD, review, security), MCP knowledge distillation
+- Read directly when: you'll edit the file, files are small/related, or ≤ 3 files in one subsystem
+- If you need full contents, read them yourself — a subagent returning unmodified file contents wastes both contexts
+- Subagents NEVER call other subagents — all coordination flows through the coordinator
+
+### HALT Protocol
+
+When the workflow must stop, execute these steps consistently:
+
+1. Set the current phase `status` to `"blocked"` in PROGRESS.json
+2. Set `haltReason` to a description of what is needed to resume
+3. Update `manage_todo_list` display (blocked phase shown as `"in-progress"`)
+4. Report to user: what failed, why it's blocked, what's needed to continue
+
+All "Execute HALT Protocol" references in this workflow invoke these 4 steps.
+
+### Decision Presentation
+
+When the workflow requires user input (post-phase failures, CONDITIONAL verdicts, triage decisions), present decisions consistently:
+
+- Use `ask_questions` tool with one question per decision point (if unavailable, present options as a numbered list in chat)
+- Provide 2–3 concrete options (e.g., "Fix now", "Proceed anyway", "Halt workflow")
+- Mark one option as `recommended` when the coordinator has a clear preference — omit when no option is clearly superior
+- Include brief context: what failed, what impact each option has
+
+---
+
+## Quality Gates
+
+### Pre-Review Gate (Pre-Review)
+
+Before delegating to Code Review (Phase 5), the coordinator verifies ALL of the following:
+
+| # | Check | How to verify |
+|---|-------|---------------|
+| 1 | Every FR-### in spec.md has corresponding implementation code | `grep_search` for each FR ID in source files |
+| 2 | Every FR-### has at least one test covering it | `grep_search` for each FR ID in test files |
+| 3 | `get_errors` returns 0 errors on modified files | Run `get_errors` |
+| 4 | Test command passes with 0 failures | Run test command from Configuration |
+| 5 | No TODO/FIXME markers remain in new code | `grep_search` for TODO\|FIXME in modified files |
+
+**PASS**: All 5 checks pass → proceed to Code Review delegation
+**FAIL**: Any check fails → create fix tasks, append to tasks.md and PROGRESS.json `fixTasks[]`, return to Phase 4. Increment `review.rubricAttempts` in PROGRESS.json.
+**Max iterations**: 3 gate attempts. After 3 failures → execute HALT Protocol: "Pre-review gate failed 3 times — escalate to user"
+
+Record results in PROGRESS.json `review.rubricScores` (pass/fail per check).
+
+### Post-Phase Validation
+
+Run validation checks after these phases before transitioning:
+
+| After Phase | Validation Steps |
+|-------------|-----------------|
+| Phase 4 (Implement) | Verify all tasks in tasks.md are `[X]`. Run tests. Run `get_errors`. All must pass. |
+| Phase 5 (Code Review) | If rejection cycle: verify fix tasks addressed. Confirm in PROGRESS.json. |
+| Phase 6 (Validate) | Full validation: tests, errors, spec compliance, task audit. Must pass before Phase 7. |
+
+If post-phase validation fails, report specific failures via Decision Presentation. User decides next step (fix, proceed, or halt).
 
 ---
 
 ## Phase 1: Coordinator Research
 
-**Coordinator executes directly** (DO NOT delegate).
+**Coordinator executes directly** — DO NOT delegate research. You need this context for Phase 2 handoff.
 
 ### Research Steps
 
-1. **CLASSIFY**: "This is a [template category/structural change] affecting [which root folders]."
-2. **SCOPE**: Identify affected folders and templates via `grep_search` or `semantic_search`
+1. **CLASSIFY**: "This is a [scope/size] feature affecting [components]."
+2. **SCOPE**: Identify affected files/modules via `grep_search` or `semantic_search`
 3. **RESEARCH**:
-   - Read existing templates in the same category for pattern consistency
-   - Check `specs/` for related prior specifications (if directory exists)
-   - Check `docs/adr/` for relevant architectural decisions
-   - Read `docs/architecture/README.md` for structural patterns
-   - Review naming conventions in `copilot-instructions.md`
-   - Search community examples: `mcp_awesome-copil_search_instructions` or `mcp_awesome-copil_search_agents`
-4. **External knowledge**: Use MCP tools for technology-specific research (all tools are configured in this workspace).
+   - Read existing patterns in affected modules
+   - Check specs directory for related prior work
+   - Check ADR directory for architectural constraints (if it exists)
+   - Read project navigation/architecture docs (if they exist)
+   - Check for `.specify/memory/constitution.md` — if it exists, note it as a governance dependency. Pass its path to plan and analyze delegations.
+4. **External knowledge**: Use MCP tools from Configuration section when available. Skip unavailable tools.
+5. **Clarify ambiguities**: For 2+ valid interpretations, ask ONE question with researched options
 
-**Output**: Research summary capturing: affected folders, existing template patterns, naming conventions, prior specs, ADR constraints.
+**Output**: Research summary — affected modules, existing patterns, prior specs, constraints, constitution path (if exists).
 
-Report to user: research summary. Mark Phase 1 complete.
+**Re-score complexity**: If research revealed significantly more scope (score delta ≥ 2 or new score changes routing), present the updated score via Decision Presentation. If score dropped to ≤ 3: offer to downgrade to `workon.myidea.prompt.md`. If score rose to ≥ 8: flag for security review in PROGRESS.json context.
+
+Report research summary to user. Update `manage_todo_list` display (Phase 1 complete, Phase 2 in-progress).
 
 ---
 
@@ -179,44 +389,57 @@ Report to user: research summary. Mark Phase 1 complete.
 
 **Delegate to**: `speckit.specify` agent
 
-The specify agent owns branch creation and spec file generation via `.specify/` scripts. The coordinator does NOT create a branch — the specify agent handles this.
-
-**Delegation prompt MUST include**:
-- USER REQUEST (original, verbatim)
-- Research context from Phase 1 (affected folders, existing patterns, naming conventions)
-- Working directory
-- Note: This is a template library project — "implementation" means creating/modifying MD files, not application code
-
-**Expected return from agent**:
-- Branch name created
-- Spec file path
-- Spec number
-- Checklist results (if validation was run)
-
-**Coordinator post-delegation**:
-1. Verify branch: `git branch --show-current` — HALT if not on feature branch
-2. Verify spec file exists and contains complete specification
-3. **Create PROGRESS.md** in the spec directory with this format:
+### Delegation Prompt
 
 ```markdown
-# Progress: {feature-name}
-
-Branch: {branch-name}
-Spec: {spec-file-path}
-
-| Phase | Status | Notes |
-|-------|--------|-------|
-| 1. Research | ✅ | [research summary headline] |
-| 2. Specification | ✅ | spec.md created |
-| 3a. Plan | ⬜ | |
-| 3b. Tasks | ⬜ | |
-| 4. Implement | ⬜ | |
-| 5. Code Review | ⬜ | Attempts: 0/2 |
-| 6. Validate | ⬜ | |
-| 7. Document | ⬜ | |
+CONTEXT: The user asked: "[original request verbatim]"
+YOUR TASK: Create a feature specification and branch using the .specify/ scripts.
+SCOPE:
+- Working directory: {project root}
+- Spec output directory: specs/
+REQUIREMENTS:
+1. Generate branch name from feature description
+2. Create feature branch
+3. Generate specification document (spec.md) using .specify/ templates
+4. Populate all specification sections with substantive content
+5. Define testable, measurable success criteria
+ACCEPTANCE CRITERIA:
+- [ ] Feature branch created and checked out
+- [ ] spec.md created with complete specification
+- [ ] All sections filled with meaningful content (no TODO placeholders, no empty sections, ≥ 1 paragraph per required section)
+- [ ] Success criteria are testable and measurable
+- [ ] Functional requirements have unique IDs (FR-###)
+CONSTRAINTS:
+- Do NOT create implementation code
+- Do NOT create plan or task documents
+- Do NOT resolve [NEEDS CLARIFICATION] markers yourself — leave them in spec.md for the coordinator to triage
+- Do NOT present handoff buttons or suggest delegating to other agents — return your results to the coordinator
+- The specification defines WHAT, not HOW
+- If you cannot complete the specification, begin your report with `STATUS: INCOMPLETE` followed by the blocking reason
+WHEN DONE: Report: branch name, spec file path, spec number, section summary, checklist results.
 ```
 
-4. Execute Phase Transition Protocol. Mark Phase 2 complete.
+Append Anti-Laziness Addendum.
+
+### Coordinator Post-Delegation
+
+1. Verify branch: `git branch --show-current` — execute HALT Protocol if not on feature branch
+2. Verify spec file exists and contains complete specification
+3. **Resolve clarifications**: Scan spec.md for `[NEEDS CLARIFICATION` markers
+   - **If markers found**: Use the `ask_questions` tool to present each clarification to the user in a single call (batch up to 4 questions per call):
+     - Extract the specific question text from inside each `[NEEDS CLARIFICATION: ...]` marker
+     - Provide 2–3 suggested answers as options per question, derived from Phase 1 research context, domain conventions, or reasonable defaults
+     - Mark one option as `recommended` when the coordinator is confident it is the best choice — omit `recommended` when no option is clearly superior
+     - The `ask_questions` tool automatically shows a free-text "Other" option to users — do NOT add a custom/other option manually
+     - After the user responds, replace each `[NEEDS CLARIFICATION: ...]` marker in spec.md with the resolved answer, written as a definitive statement (not a question)
+     - Re-scan spec.md to confirm zero markers remain before proceeding
+   - **If no markers found**: Proceed silently to the next step
+4. **Create PROGRESS.json** in the spec directory (see State Management → Schema)
+   - Mark `research` and `specification` as `"completed"` (retroactively)
+   - Mark `plan` as `"in-progress"`
+   - Populate `context` from Phase 1 research output
+
+Execute Phase Transition Protocol.
 
 ---
 
@@ -226,188 +449,352 @@ Spec: {spec-file-path}
 
 **Delegate to**: `speckit.plan` agent
 
-**Delegation prompt MUST include**:
-- USER REQUEST, spec file path, working directory
-- Note: "Implementation" in this project means authoring MD templates and documentation — plan accordingly
-- Task: Generate plan.md, research.md, and quickstart.md (data-model.md unlikely needed for a template library)
+#### Delegation Prompt
 
-**Coordinator verifies**: plan.md exists in spec directory.
+The plan agent defines its own phases, output files, and template workflow. The delegation provides instance context and lean anchors (key spec requirements and constraints — enough to ground the agent without passing full artifacts).
 
-Execute Phase Transition Protocol. Mark Phase 3a complete.
+```markdown
+CONTEXT: The user asked: "[original request verbatim]"
+YOUR TASK: Generate implementation plan documents from the specification.
+SCOPE:
+- Feature directory: {spec directory}
+- Governance: [constitution.md path from Phase 1 research, or "none"]
+- Research context: [affected modules, existing patterns, constraints from PROGRESS.json context]
+REQUIREMENTS:
+1. Generate plan artifacts (plan.md, research.md, data-model.md if applicable, quickstart.md)
+ACCEPTANCE CRITERIA:
+- [ ] plan.md exists with meaningful content (no TODO placeholders, no empty sections)
+- [ ] All documents are consistent with the specification
+CONSTRAINTS:
+- Your scope ends after plan artifact generation. Task breakdowns and implementation are separate phases handled by the coordinator.
+- Do NOT present handoff buttons or suggest delegating to other agents — return your results to the coordinator.
+- If you cannot complete the plan, begin your report with `STATUS: INCOMPLETE` followed by the blocking reason
+WHEN DONE: Report: documents created, implementation approach summary, key technical decisions.
+```
+
+Append Anti-Laziness Addendum.
+
+**Coordinator verifies**: plan.md exists in spec directory with meaningful content (no TODO placeholders, no empty sections). Scan for research.md, data-model.md, quickstart.md — report which optional artifacts were generated vs. skipped so downstream agents know what's available.
+
+Execute Phase Transition Protocol.
 
 ### Phase 3b: Task Generation
 
 **Delegate to**: `speckit.tasks` agent
 
-**Delegation prompt MUST include**:
-- USER REQUEST, feature directory path, list of available design docs
-- **Workspace-specific task requirements**:
-  - Every new template MUST be created in the root authoritative folder first
-  - A corresponding task for `.github/` copy if the template is workspace-active
-  - A README.md sync task for any template add/remove/rename
-  - An ADR task if the work introduces new conventions or structural changes
-  - Frontmatter validation task for every new template file
+#### Delegation Prompt
+
+The tasks agent defines its own checklist format, phase structure, and organization rules. The delegation provides instance context, lean anchors (key spec requirements and constraints), and activates test generation.
+
+```markdown
+CONTEXT: The user asked: "[original request verbatim]"
+YOUR TASK: Break the implementation plan into dependency-ordered tasks.
+SCOPE:
+- Feature directory: {spec directory}
+REQUIREMENTS:
+1. Generate tasks.md with dependency-ordered, executable tasks
+2. Override your default: tests ARE mandatory for this delegation — generate test tasks before their corresponding implementation tasks (test-first)
+3. If Configuration → Project Rules defines additional test requirements, apply them
+ACCEPTANCE CRITERIA:
+- [ ] tasks.md exists with proper checklist format and file paths
+- [ ] Test tasks precede implementation tasks
+- [ ] EVERY requirement above is fully implemented (no partial work)
+CONSTRAINTS:
+- Your scope ends after generating tasks.md. Implementation is a separate phase handled by the coordinator.
+- Do NOT present handoff buttons or suggest delegating to other agents — return your results to the coordinator.
+- If you cannot complete the task breakdown, begin your report with `STATUS: INCOMPLETE` followed by the blocking reason
+WHEN DONE: Report: task count, dependency summary, estimated complexity.
+```
+
+Append Anti-Laziness Addendum.
 
 **Coordinator verifies**: tasks.md exists with proper task format (checkboxes, IDs, file paths).
 
-Execute Phase Transition Protocol. Mark Phase 3b complete.
+Execute Phase Transition Protocol.
+
+---
+
+## Phase 3c: Cross-Artifact Analysis
+
+**Delegate to**: `speckit.analyze` agent
+
+**Purpose**: Catch inconsistencies, coverage gaps, and ambiguities across spec.md, plan.md, and tasks.md **before** the expensive implementation phase.
+
+### Delegation Prompt
+
+```markdown
+CONTEXT: The user asked: "[original request verbatim]"
+YOUR TASK: Analyze the feature artifacts for consistency and coverage issues.
+SCOPE:
+- Feature directory: {spec directory}
+- Governance: [constitution.md path from Phase 1 research, or "none"]
+REQUIREMENTS:
+1. Run detection passes across spec.md, plan.md, and tasks.md
+2. Assign severity to every finding
+3. Produce the coverage summary and metrics
+ACCEPTANCE CRITERIA:
+- [ ] Findings table with severity, location, and recommendation per finding
+- [ ] Coverage summary maps requirements to tasks
+- [ ] Metrics section complete (coverage %, issue counts)
+CONSTRAINTS:
+- Your scope ends after producing the analysis report with findings table, coverage summary, and metrics. The coordinator handles remediation triage and user interaction separately.
+- Do NOT present handoff buttons or suggest delegating to other agents — return your results to the coordinator.
+WHEN DONE: Report: findings table, coverage summary, metrics, and recommended next actions.
+```
+
+Append Anti-Laziness Addendum.
+
+### Coordinator Post-Delegation: Triage Findings
+
+The coordinator processes the analysis report in three passes:
+
+#### Pass 1: Auto-resolve trivial findings
+
+Findings that have exactly one obvious fix require no user input. Apply them directly:
+
+- **Terminology drift**: Normalize to the canonical term used in spec.md
+- **Wrong file paths in tasks.md**: Correct to match actual project structure
+- **Unresolved placeholders** (TODO, TKTK, ???): Fill from spec/plan context if unambiguous
+- **Task ordering errors**: Reorder in tasks.md to satisfy stated dependencies
+- **Duplicate requirements**: Remove the lower-quality duplicate, keep the clearer version
+
+After applying auto-fixes, re-scan modified artifacts to verify no new inconsistencies were introduced. Report a summary of changes made (artifact, old value → new value) so the user can verify. If any auto-fix is uncertain or introduces a new issue, demote it to Pass 2 (user decision).
+
+Record count in PROGRESS.json `analyze.autoResolved`.
+
+#### Pass 2: Present decision-required findings to user
+
+Findings with multiple valid resolutions require user input. Use `ask_questions` to present them:
+
+- Batch up to 4 findings per `ask_questions` call
+- For each finding, extract the core decision from the analysis recommendation
+- Provide 2–3 resolution options derived from the analyze report's recommendations and the coordinator's Phase 1 research context
+- Mark one option as `recommended` when the coordinator is confident — omit when no option is clearly superior
+- The `ask_questions` tool automatically shows a free-text "Other" option — do NOT add one manually
+- After user responds, apply the chosen resolution to the affected artifact(s) (spec.md, plan.md, or tasks.md)
+- Record count in PROGRESS.json `analyze.userResolved`
+
+**Examples of decision-required findings**:
+- Conflicting requirements (e.g., spec says REST, plan says GraphQL) — user picks which
+- Missing non-functional coverage — user decides if it should be added to tasks or deferred
+- Ambiguous terms lacking measurable criteria — user provides the target metric
+
+#### Pass 3: Gate implementation
+
+After passes 1 and 2, evaluate remaining unresolved findings:
+
+| Remaining findings | Action |
+|--------------------|--------|
+| 0 CRITICAL, 0 HIGH | Proceed to Phase 4 |
+| 0 CRITICAL, 1+ HIGH | Report to user via Decision Presentation — user decides: fix or proceed |
+| 1+ CRITICAL | Execute HALT Protocol — must resolve before implementation |
+
+**If user chooses "fix" for HIGH findings**: Coordinator creates targeted fix tasks in the affected artifact(s) (spec.md, plan.md, or tasks.md), then re-runs Phase 3c analysis on affected artifacts only. Max 2 re-analysis cycles — after 2, execute HALT Protocol: "Analysis re-runs exhausted — escalate remaining findings to user."
+
+Record final severity counts in PROGRESS.json `analyze.findings`.
+
+Execute Phase Transition Protocol.
 
 ---
 
 ## Phase 4: Implementation
 
+> **Hard Rule reminder**: Use Delegation Template + Anti-Laziness Addendum for ALL subagent calls.
+
 **Delegate to**: `speckit.implement` agent
 
-**Delegation prompt MUST include**:
-- USER REQUEST, tasks file path, design doc paths
-- **Workspace-specific rules**:
-  - Root folders are authoritative — create templates there first
-  - Follow naming conventions: `{technology}.instructions.md`, `{purpose}.agent.md`, etc.
-  - Frontmatter must include required fields (`description` + `applyTo` for instructions, `description` + `name` for agents)
-  - No project-specific references in root templates (they must be portable)
-  - `.github/` copies may include workspace-specific customizations
-- ⚠️ **Context anchor**: "After implementation, the coordinator proceeds to Phase 5 (Code Review), Phase 6 (Validate), and Phase 7 (Document). The implement agent does NOT manage these phases."
-- **MCP mandate**: Use MCP tools for external knowledge. Do NOT rely on training data for API signatures or version numbers.
+### Delegation Prompt
 
-**Coordinator post-delegation**:
+The implement agent defines its own phase execution, progress tracking, and validation flow. The delegation provides instance context, lean anchors, and overrides.
+
+```markdown
+CONTEXT: The user asked: "[original request verbatim]"
+YOUR TASK: Execute all tasks in the implementation plan.
+SCOPE:
+- Feature directory: {spec directory}
+REQUIREMENTS:
+1. Override your default: tests ARE mandatory for this delegation — write tests BEFORE implementation code (test-first). Discover test patterns from existing tests in affected modules.
+2. If Configuration → Project Rules defines additional requirements, apply them
+3. Use MCP tools for external library/API verification — do NOT rely on training data
+4. If you cannot complete all tasks, begin your report with `STATUS: INCOMPLETE` followed by the blocking reason
+ACCEPTANCE CRITERIA:
+- [ ] All tasks in tasks.md marked [X]
+- [ ] All tests pass and no lint/compile errors
+- [ ] EVERY requirement above is fully implemented (no partial work)
+CONSTRAINTS:
+- Your scope ends after task execution. Code review, validation, and documentation are separate phases handled by the coordinator.
+- Do NOT present handoff buttons or suggest delegating to other agents — return your results to the coordinator.
+WHEN DONE: Report: files created/modified, test results summary, task completion status, issues encountered.
+```
+
+Append Anti-Laziness Addendum.
+
+**TDD Agent Alternative**: If Configuration → Project Rules specifies "test-first development" (TDD), delegate the test-first cycle to TDD agents instead of speckit.implement:
+1. `TDD Red Phase` — write failing tests from task requirements
+2. `TDD Green Phase` — implement minimal code to pass tests
+3. `TDD Refactor Phase` — improve quality while maintaining green tests
+
+Otherwise, use speckit.implement with the test-first requirements above.
+
+### Coordinator Post-Delegation
+
 1. Verify all tasks in tasks.md are marked complete (`[X]`)
-2. Run `get_errors` on modified files — report any issues
-3. **Read PROGRESS.md** — verify phases 5-7 are still tracked as ⬜ not-started
+2. **Check for INCOMPLETE status**: If implement agent returned `STATUS: INCOMPLETE`, present the blocking reason to user via Decision Presentation. Options: re-delegate with guidance, fix manually, halt workflow.
+3. **Run Post-Phase Validation**: Run tests + `get_errors` on modified files
+4. Read PROGRESS.json — verify phases review/validate/document are still `"not-started"`
 
-Execute Phase Transition Protocol. Mark Phase 4 complete.
+Execute Phase Transition Protocol.
 
 ---
 
 ## Phase 5: Code Review
 
-**Delegate to**: `code-review` agent
+### Pre-Review Self-Check
 
-**Attempts tracked**: PROGRESS.md records review iteration count. Maximum 2 attempts before escalation.
+1. Run **Pre-Review Gate** (see Quality Gates)
+2. If any check fails: create fix tasks, append to tasks.md and PROGRESS.json `fixTasks[]`, increment `review.rubricAttempts`, return to Phase 4
+3. If all checks pass: proceed to delegation
 
-**Delegation prompt MUST include**:
-- Spec file path, branch name
-- Review scope: spec compliance, template quality, naming conventions, frontmatter correctness, README sync
-- Changed files summary (from `get_changed_files`)
-- **Workspace-specific checks**:
-  - Root templates have no project-specific references (portable)
-  - `.github/` copies are appropriately customized
-  - Naming conventions followed
-  - Frontmatter includes required fields
-  - README.md tables updated for any template changes
-  - ADR created if needed
+### Pre-Review Error Check
 
-**Coordinator Decision**:
+Reuse `get_errors` results from Pre-Review Gate check #3 (do not re-run). Include findings in the delegation prompt as a numbered REQUIREMENTS item — the review agent cannot access IDE diagnostics.
+
+**Pre-existing errors from `get_errors`**: Include verbatim in the delegation under a `PRE-EXISTING ERRORS` section after SCOPE.
+
+### Delegate to Code Review Agent
+
+**Optional: Security Review** — If the feature's `complexityScore ≥ 8` OR the feature touches security-sensitive areas (authentication, file I/O, network, user input), additionally delegate to a security-focused review agent. Security findings feed into the same verdict flow.
+
+**Attempts tracked**: PROGRESS.json `review.attempts` field. Maximum 2 attempts before escalation.
+
+#### Delegation Prompt
+
+```markdown
+CONTEXT: The user asked: "[original request verbatim]"
+YOUR TASK: Review code changes for quality, security, correctness, and spec compliance.
+SCOPE:
+- Spec file: {spec path}
+- Branch: {branch name}
+- Files modified: [list from get_changed_files]
+- Files to NOT touch: [all other files]
+PRE-EXISTING ERRORS:
+[get_errors output from Pre-Review Gate check #3, or "none"]
+REQUIREMENTS:
+1. Verify spec compliance: check each functional requirement (FR-###)
+2. Verify success criteria from spec are met
+3. Check for security vulnerabilities
+4. Verify test coverage for new/changed code
+5. Check error handling completeness
+6. Verify adherence to project conventions (discover from `.github/instructions/`, linter configs, and existing code patterns)
+7. Identify performance concerns
+ACCEPTANCE CRITERIA:
+- [ ] Every modified file reviewed
+- [ ] Spec compliance verified for each FR-### requirement
+- [ ] Severity assigned to each finding (critical/high/medium/low)
+- [ ] Specific line references for each finding
+- [ ] Suggested fix for each critical/high finding
+CONSTRAINTS:
+- Do NOT modify any files
+- Review ONLY the files listed in scope
+- Base review on spec requirements and project conventions, not personal preference
+- Do NOT present handoff buttons or suggest delegating to other agents — return your results to the coordinator
+WHEN DONE: Report verdict (APPROVED/CONDITIONAL/REJECTED), spec compliance checklist, all findings with severity, fix suggestions for critical/high issues.
+```
+
+Append Anti-Laziness Addendum.
+
+### Verdict Handling
 
 | Verdict | Criteria | Action |
 |---------|----------|--------|
 | **APPROVED** | 0 critical/high issues | Proceed to Phase 6 |
-| **CONDITIONAL** | 1-3 critical/high issues | Ask user: accept as-is or fix? |
-| **REJECTED** | 4+ critical/high issues | See Rejection Handling below |
+| **CONDITIONAL** | 1-3 critical/high issues | User decides: accept or revise |
+| **REJECTED** | 4+ critical/high issues | See Rejection Handling |
 
 ### Rejection Handling
 
-1. Increment review attempt counter in PROGRESS.md
+1. Increment `review.attempts` in PROGRESS.json. Append findings to `review.findings[]`.
 2. **If attempt ≤ 2**:
-   - Insert fix tasks (IDs 100+) into todo list
-   - **PRESERVE IDs 7-8** (Validate and Document) — verify they exist before submitting the update
-   - Return to Phase 4 with fix tasks only (do not re-run all implementation tasks)
-3. **If attempt > 2**: **HALT and escalate to user**:
-   - Report: all findings across all iterations
-   - Options: manual fix, reduce scope, accept as-is, abandon review
-   - Do NOT loop again without explicit user direction
+   - Create fix tasks from review findings (one task per critical/high issue)
+   - Append fix tasks to **both** `tasks.md` (so `speckit.implement` can see them) and PROGRESS.json `fixTasks[]` (for tracking)
+   - Return to Phase 4 with delegation scoped to fix tasks only
+3. **If attempt > 2**: Execute HALT Protocol — escalate to user with full analysis across all attempts. Options: manual fix, reduce scope, accept as-is, abandon review.
 
-Execute Phase Transition Protocol after APPROVED or CONDITIONAL-accepted. Mark Phase 5 complete.
+Execute Phase Transition Protocol after APPROVED or CONDITIONAL-accepted.
 
 ---
 
 ## Phase 6: Validate
 
-**Coordinator executes directly.** This phase is MANDATORY — do not skip even if code review passed.
+**Coordinator executes directly.** MANDATORY — do not skip even if code review passed.
 
-### Validation Steps (Template Library — no test runner)
+**Purpose**: Phase 6 is a final integration gate — it catches issues that file-by-file review misses, including regressions introduced during review fix cycles.
 
-1. **Frontmatter audit**: For every new/modified template file, verify:
-   - Instructions: `description` and `applyTo` fields present
-   - Agents: `description` and `name` fields present
-   - Prompts: `description` field present; `agent` field if applicable
-   - Skills: `name` and `description` fields present
-2. **File placement**: Verify authoritative versions exist in root folders, `.github/` copies where needed
-3. **Naming conventions**: Verify filenames match patterns (`{technology}.instructions.md`, etc.)
-4. **README.md sync**: Read README.md `What's Inside` tables and verify all new/changed templates are listed
-5. **Cross-references**: `grep_search` for any broken links or references to renamed/removed files
-6. **Lint check**: Run `get_errors` on all modified files for markdown syntax issues
-7. **Spec compliance**: Read spec.md Success Criteria and cross-reference against implementation
+### Validation Steps
+
+1. **Run tests**: Execute test command from Configuration section
+   - If tests fail: report failures with details. User decides next step.
+2. **Check errors**: Run `get_errors` on all modified files
+   - Report remaining lint/compile errors with file paths
+3. **Spec compliance**: Read spec.md Success Criteria and cross-reference against implementation
    - For each criterion: ✅ Met | ❌ Not met | ⚠️ Partially met
+4. **Task audit**: Verify all tasks in tasks.md are marked `[X]`
 
 ### Validation Report
 
-Report to user in this format:
-
 ```
 Validation Results:
-- Frontmatter: [PASS/FAIL] — [details of any issues]
-- File Placement: [PASS/FAIL] — [root vs .github/ audit]
-- Naming: [PASS/FAIL] — [convention compliance]
-- README Sync: [PASS/FAIL] — [tables match files]
-- Cross-references: [PASS/FAIL] — [broken links found]
-- Lint: [count] issues remaining
+- Tests: [PASS/FAIL] — [summary]
+- Errors: [count] lint/compile issues remaining
 - Spec Criteria: [N/M] success criteria met
+- Tasks: [N/M] tasks complete
 - Overall: [PASS/FAIL]
 ```
 
-If validation fails, report specific failures. User decides whether to fix or proceed.
+If validation fails, report specific failures via Decision Presentation. User decides whether to fix or proceed.
 
-Execute Phase Transition Protocol. Mark Phase 6 complete.
+Execute Phase Transition Protocol.
 
 ---
 
 ## Phase 7: Document
 
-**Coordinator executes directly.** This phase is MANDATORY — do not skip even for "internal" changes.
+**Coordinator executes directly.** MANDATORY — do not skip even for "internal" features.
 
 ### Documentation Steps
 
-1. **Spec updates**: If any requirements changed during implementation, update spec.md to reflect actuals
-2. **README.md**: Final verification that `What's Inside` tables, `Tech Stack Coverage`, and `Docs` sections are current
-3. **Architecture docs**: If structural patterns changed, update `docs/architecture/README.md`
-4. **ADR**: Create in `docs/adr/` if this work introduced:
-   - New conventions or naming patterns
-   - Philosophy changes (e.g., how templates are organized or authored)
-   - Technology additions to the library
-   - Structural reorganization
-5. **Development docs**: If workflows changed, update `docs/development/README.md`
-6. **Prompt craft docs**: If prompt techniques were refined, update `docs/prompt-craft/README.md`
-7. **PROGRESS.md**: Mark all phases complete, add final summary
+1. **Spec updates**: Compare implementation against spec.md. For intentional scope changes approved during Phase 3c/4, update spec.md to reflect the approved change. For unintentional drift, create a follow-up task to align implementation with spec.
+2. **Architecture docs**: If new components, patterns, or integrations were added:
+   - Update relevant architecture documentation (if it exists)
+   - If a significant architectural decision was made, delegate to `ADR Generator`
+3. **User-facing docs**: If the feature changes user-visible behavior:
+   - Delegate to `SE: Tech Writer` for documentation updates
+   - Include usage examples
+4. **Finalize PROGRESS.json**: Mark all phases `"completed"`, set `haltReason` to `null`, add final summary
 
 ### Documentation Report
 
 ```
 Documentation Updates:
-- README.md: [updated/no change]
+- Files updated: [list or "none"]
 - ADR created: [yes/no — title if yes]
-- Architecture docs: [updated/no change]
-- Development docs: [updated/no change]
-- Other files: [list or "none"]
+- User docs updated: [yes/no — what changed]
 ```
-
-Mark Phase 7 complete.
 
 ---
 
 ## Completion Checklist
 
 - [ ] spec.md, plan.md, tasks.md created in spec directory
-- [ ] All tasks completed
+- [ ] Analysis findings resolved (0 critical/high remaining)
+- [ ] All tasks completed, all tests passing
 - [ ] Code review APPROVED or CONDITIONAL (accepted by user)
-- [ ] No lint/syntax errors
-- [ ] Frontmatter valid on all new/modified templates
-- [ ] Templates in root authoritative folders (with `.github/` copies where needed)
-- [ ] README.md tables synchronized with actual files
-- [ ] ADR created if conventions/structure changed
+- [ ] No lint/compile errors
 - [ ] Spec success criteria validated
-- [ ] PROGRESS.md shows all phases ✅
+- [ ] Documentation updated (or justified as unnecessary)
+- [ ] PROGRESS.json shows all phases `"completed"`
 
-**Final Report**: Spec number, branch, templates created/modified, README sync status, ADR status, next steps (merge/PR).
+**Final Report**: Spec number, branch, implementation summary, test results, documentation changes, next steps (merge/PR).
 
 ---
 
@@ -415,11 +802,18 @@ Mark Phase 7 complete.
 
 | Scenario | Action |
 |----------|--------|
-| Subagent returns incomplete output | Verify file(s) exist. Use partial output, note gaps, ask user |
-| Code review REJECTED (attempt ≤ 2) | Insert fix tasks (IDs 100+), **PRESERVE IDs 7-8**, return to Phase 4 |
-| Code review REJECTED (attempt > 2) | **HALT** — escalate to user with full analysis |
-| PROGRESS.md missing or corrupted | Recreate from todo list state before continuing |
-| Branch not on feature branch | HALT — resolve git state before continuing |
-| Template in wrong folder | Move to root authoritative folder, update `.github/` copy |
-| README.md out of sync | Add to fix tasks — must be resolved before merge |
-| Todo list update | **ALWAYS** include ALL 8 items (IDs 1-8) plus dynamic tasks (100+) |
+| PROGRESS.json missing/corrupted | Execute HALT Protocol — recreate from last known state |
+| Subagent returns incomplete output | Verify file(s) exist. If `STATUS: INCOMPLETE`, present blocking reason via Decision Presentation. Otherwise use partial output, note gaps, ask user |
+| Test failures in Phase 4 | Normal TDD — fix in implementation. Not a workflow error |
+| Rubric fail (rubricAttempts < 3) | Create fix tasks in tasks.md + PROGRESS.json `fixTasks[]`, return to Phase 4 |
+| Rubric fail (rubricAttempts ≥ 3) | Execute HALT Protocol — escalate to user |
+| Code review REJECTED (attempt ≤ 2) | Add fix tasks to tasks.md + PROGRESS.json `fixTasks[]`, return to Phase 4 |
+| Code review REJECTED (attempt > 2) | Execute HALT Protocol — escalate to user with full analysis |
+| Post-phase validation fails | Report failures via Decision Presentation. User decides next step |
+| Analyze finds CRITICAL issues | Execute HALT Protocol — resolve before Phase 4. Auto-fix trivials, ask user for decisions |
+| Branch not on feature branch | Execute HALT Protocol — resolve git state before continuing |
+| MCP tool unavailable | Use fallback from Configuration table. Note limitation to user |
+| Total Phase 4 executions > 4 | Execute HALT Protocol — max 4 total Phase 4 delegations (gate + review combined) |
+| User requests workflow abandon | Set phase to `"blocked"`, report changes summary, ask user: revert uncommitted changes or keep, optionally delete feature branch |
+
+> **Limit precedence**: The total Phase 4 cap (> 4 cycles) is the master limit. Individual counters (`rubricAttempts` < 3, `review.attempts` ≤ 2) may trigger HALT first. Whichever limit is reached first takes effect.
