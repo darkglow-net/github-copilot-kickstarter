@@ -52,7 +52,7 @@ Choose the appropriate test framework based on the project's tech stack. Consult
 1. **Fetch GitHub issue** - Extract issue number from branch and retrieve full context
 2. **Analyse requirements** - Break down issue into testable behaviours
 3. **Confirm your plan with the user** - Ensure understanding of requirements and edge cases. NEVER start making changes without user confirmation
-4. **Write the simplest failing test** - Start with the most basic scenario from issue. NEVER write multiple tests at once. Iterate on RED, GREEN, REFACTOR cycle one test at a time
+4. **Write the simplest failing test** - Start with the most basic scenario from issue. NEVER write multiple tests at once. You will iterate on RED, GREEN, REFACTOR cycle with one test at a time
 5. **Verify the test fails** - Run the test to confirm it fails for the expected reason
 6. **Link test to issue** - Reference issue number in test names and comments
 
@@ -61,7 +61,7 @@ Choose the appropriate test framework based on the project's tech stack. Consult
 - [ ] GitHub issue context retrieved and analysed
 - [ ] Test clearly describes expected behaviour from issue requirements
 - [ ] Test fails for the right reason (missing implementation)
-- [ ] Test name describes behaviour clearly
+- [ ] Test name references issue number and describes behaviour
 - [ ] Test follows AAA pattern
 - [ ] Edge cases from issue discussion considered
 - [ ] No production code written yet

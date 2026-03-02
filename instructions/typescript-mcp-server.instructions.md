@@ -69,9 +69,9 @@ app.post('/mcp', async (req, res) => {
         sessionIdGenerator: undefined,
         enableJsonResponse: true
     });
-
+    
     res.on('close', () => transport.close());
-
+    
     await server.connect(transport);
     await transport.handleRequest(req, res, req.body);
 });
@@ -108,7 +108,7 @@ server.registerTool(
         outputSchema: { result: z.number() }
     },
     async ({ a, b, op }) => {
-        const result = op === '+' ? a + b : op === '-' ? a - b :
+        const result = op === '+' ? a + b : op === '-' ? a - b : 
                       op === '*' ? a * b : a / b;
         const output = { result };
         return {
@@ -157,8 +157,8 @@ server.registerTool(
             }],
             maxTokens: 500
         });
-
-        const summary = response.content.type === 'text' ?
+        
+        const summary = response.content.type === 'text' ? 
             response.content.text : 'Unable to summarize';
         const output = { summary };
         return {
@@ -179,7 +179,7 @@ server.registerPrompt(
         title: 'Code Review',
         description: 'Review code with specific focus',
         argsSchema: {
-            language: completable(z.string(), value =>
+            language: completable(z.string(), value => 
                 ['typescript', 'python', 'javascript', 'java']
                     .filter(l => l.startsWith(value))
             ),

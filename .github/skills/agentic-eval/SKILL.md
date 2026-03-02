@@ -1,16 +1,18 @@
 ---
 name: agentic-eval
-description: 'Patterns and techniques for evaluating and improving AI agent outputs. Use this skill when implementing self-critique and reflection loops, building evaluator-optimizer pipelines for quality-critical generation, creating test-driven code refinement workflows, designing rubric-based or LLM-as-judge evaluation systems, adding iterative improvement to agent outputs (code, reports, analysis), and measuring agent response quality.'
+description: |
+  Patterns and techniques for evaluating and improving AI agent outputs. Use this skill when:
+  - Implementing self-critique and reflection loops
+  - Building evaluator-optimizer pipelines for quality-critical generation
+  - Creating test-driven code refinement workflows
+  - Designing rubric-based or LLM-as-judge evaluation systems
+  - Adding iterative improvement to agent outputs (code, reports, analysis)
+  - Measuring and improving agent response quality
 ---
 
 # Agentic Evaluation Patterns
 
 Patterns for self-improvement through iterative evaluation and refinement.
-
-> **Workspace-baseline context**: This skill supports the template quality workflow.
-> Use alongside `@Code Review Agent` (quality checklist validation),
-> `@SpecKit Analyze` (cross-artifact consistency), and the Quality Checklist
-> in `copilot-instructions.md` to evaluate generated templates against baseline standards.
 
 ## Overview
 
@@ -27,7 +29,6 @@ Generate → Evaluate → Critique → Refine → Output
 - **Quality-critical generation**: Code, reports, analysis requiring high accuracy
 - **Tasks with clear evaluation criteria**: Defined success metrics exist
 - **Content requiring specific standards**: Style guides, compliance, formatting
-- **Template validation**: Checking new instructions/agents/prompts/skills against baseline Hard Rules and Quality Checklist
 
 ---
 
@@ -186,18 +187,3 @@ def evaluate_with_rubric(output: str, rubric: dict) -> float:
 - [ ] Log all iterations for debugging
 - [ ] Handle evaluation parse failures gracefully
 ```
-
----
-
-## Baseline Template Evaluation Rubric
-
-When evaluating templates authored for this library, use these criteria derived from `.github/copilot-instructions.md`:
-
-| Dimension | Weight | Pass Criteria |
-|-----------|--------|---------------|
-| **Frontmatter** | 0.25 | Valid `description` + `applyTo` (instructions) or `name` (agents/skills) |
-| **Agnostic** | 0.25 | No project-specific references; tech-specific only where inherent |
-| **Naming** | 0.15 | Follows `{technology}.instructions.md` / `{purpose}.agent.md` / `{name}/SKILL.md` |
-| **Root authoritative** | 0.15 | Canonical version exists in root catalog folder |
-| **README listed** | 0.10 | Entry present in `README.md` tables |
-| **MCP accuracy** | 0.10 | Tool names and parameter patterns are correct |

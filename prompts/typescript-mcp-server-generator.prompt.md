@@ -1,5 +1,4 @@
 ---
-agent: 'agent'
 description: 'Generate a complete MCP server project in TypeScript with tools, resources, and proper configuration'
 ---
 
@@ -62,7 +61,7 @@ Create a complete Model Context Protocol (MCP) server in TypeScript with the fol
 - System information retrieval
 
 ## Configuration Options
-- **For HTTP Servers**:
+- **For HTTP Servers**: 
   - Port configuration via environment variables
   - CORS setup for browser clients
   - Session management (stateless vs stateful)

@@ -142,44 +142,6 @@ Context 'Integration tests' -Skip { }
 - **Single Responsibility**: One assertion per test when possible
 - **Test File Organization**: Group related tests in Context blocks. Context blocks can be nested.
 
-## Module Loading Patterns
-
-**Critical**: Never mix Import-Module and dot-sourcing for the same module.
-
-```powershell
-# Public functions — use Import-Module
-BeforeAll {
-    Import-Module "$PSScriptRoot/../ModuleName.psd1" -Force
-}
-
-# Private functions — dot-source the specific file
-BeforeAll {
-    . "$PSScriptRoot/../src/private/Get-InternalHelper.ps1"
-}
-```
-
-## Non-Interactive Testing
-
-For CI/CD and automated runs, suppress all interactive prompts:
-
-```powershell
-Context 'When removing items' {
-    BeforeAll {
-        $ConfirmPreference = 'None'  # Suppress Confirm prompts
-    }
-
-    It 'Should remove without prompting' {
-        { Remove-CacheFile -Path $TestDrive/cache.db -Confirm:$false } | Should -Not -Throw
-    }
-}
-```
-
-**Non-Interactive Rules:**
-- ✅ Use `-Confirm:$false` on cmdlets with `ShouldProcess`
-- ✅ Set `$ConfirmPreference = 'None'` in BeforeAll for blocks that test destructive operations
-- ✅ Use `-Force` where applicable to bypass prompts
-- ❌ Never rely on user input in automated test runs
-
 ## Example Test Pattern
 
 ```powershell

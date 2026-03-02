@@ -1,18 +1,16 @@
 ---
 description: 'Technology-agnostic blueprint generator for creating comprehensive copilot-instructions.md files that guide GitHub Copilot to produce code consistent with project standards, architecture patterns, and exact technology versions by analyzing existing codebase patterns and avoiding assumptions.'
-agent: 'agent'
 ---
 
 # Copilot Instructions Blueprint Generator
 
 ## Configuration Variables
-
-${PROJECT_TYPE="Auto-detect|.NET|Java|JavaScript|TypeScript|React|Angular|Python|Multiple|Other"}
-${ARCHITECTURE_STYLE="Layered|Microservices|Monolithic|Domain-Driven|Event-Driven|Serverless|Mixed"}
-${CODE_QUALITY_FOCUS="Maintainability|Performance|Security|Accessibility|Testability|All"}
-${DOCUMENTATION_LEVEL="Minimal|Standard|Comprehensive"}
-${TESTING_REQUIREMENTS="Unit|Integration|E2E|TDD|BDD|All"}
-${VERSIONING="Semantic|CalVer|Custom"}
+${PROJECT_TYPE="Auto-detect|.NET|Java|JavaScript|TypeScript|React|Angular|Python|Multiple|Other"} <!-- Primary technology -->
+${ARCHITECTURE_STYLE="Layered|Microservices|Monolithic|Domain-Driven|Event-Driven|Serverless|Mixed"} <!-- Architectural approach -->
+${CODE_QUALITY_FOCUS="Maintainability|Performance|Security|Accessibility|Testability|All"} <!-- Quality priorities -->
+${DOCUMENTATION_LEVEL="Minimal|Standard|Comprehensive"} <!-- Documentation requirements -->
+${TESTING_REQUIREMENTS="Unit|Integration|E2E|TDD|BDD|All"} <!-- Testing approach -->
+${VERSIONING="Semantic|CalVer|Custom"} <!-- Versioning approach -->
 
 ## Generated Prompt
 
@@ -73,7 +71,7 @@ When context files don't provide specific guidance:
    - Logging approaches
    - Documentation style
    - Testing patterns
-
+   
 3. Follow the most consistent patterns found in the codebase
 4. When conflicting patterns exist, prioritize patterns in newer files or files with higher test coverage
 5. Never introduce patterns not found in the existing codebase
@@ -117,20 +115,20 @@ ${CODE_QUALITY_FOCUS.includes("Testability") || CODE_QUALITY_FOCUS == "All" ? `#
 
 ## Documentation Requirements
 
-${DOCUMENTATION_LEVEL == "Minimal" ?
+${DOCUMENTATION_LEVEL == "Minimal" ? 
 `- Match the level and style of comments found in existing code
 - Document according to patterns observed in the codebase
 - Follow existing patterns for documenting non-obvious behavior
 - Use the same format for parameter descriptions as existing code` : ""}
 
-${DOCUMENTATION_LEVEL == "Standard" ?
+${DOCUMENTATION_LEVEL == "Standard" ? 
 `- Follow the exact documentation format found in the codebase
 - Match the XML/JSDoc style and completeness of existing comments
 - Document parameters, returns, and exceptions in the same style
 - Follow existing patterns for usage examples
 - Match class-level documentation style and content` : ""}
 
-${DOCUMENTATION_LEVEL == "Comprehensive" ?
+${DOCUMENTATION_LEVEL == "Comprehensive" ? 
 `- Follow the most detailed documentation patterns found in the codebase
 - Match the style and completeness of the best-documented code
 - Document exactly as the most thoroughly documented files do
@@ -139,7 +137,7 @@ ${DOCUMENTATION_LEVEL == "Comprehensive" ?
 
 ## Testing Approach
 
-${TESTING_REQUIREMENTS.includes("Unit") || TESTING_REQUIREMENTS == "All" ?
+${TESTING_REQUIREMENTS.includes("Unit") || TESTING_REQUIREMENTS == "All" ? 
 `### Unit Testing
 - Match the exact structure and style of existing unit tests
 - Follow the same naming conventions for test classes and methods
@@ -147,26 +145,26 @@ ${TESTING_REQUIREMENTS.includes("Unit") || TESTING_REQUIREMENTS == "All" ?
 - Apply the same mocking approach used in the codebase
 - Follow existing patterns for test isolation` : ""}
 
-${TESTING_REQUIREMENTS.includes("Integration") || TESTING_REQUIREMENTS == "All" ?
+${TESTING_REQUIREMENTS.includes("Integration") || TESTING_REQUIREMENTS == "All" ? 
 `### Integration Testing
 - Follow the same integration test patterns found in the codebase
 - Match existing patterns for test data setup and teardown
 - Use the same approach for testing component interactions
 - Follow existing patterns for verifying system behavior` : ""}
 
-${TESTING_REQUIREMENTS.includes("E2E") || TESTING_REQUIREMENTS == "All" ?
+${TESTING_REQUIREMENTS.includes("E2E") || TESTING_REQUIREMENTS == "All" ? 
 `### End-to-End Testing
 - Match the existing E2E test structure and patterns
 - Follow established patterns for UI testing
 - Apply the same approach for verifying user journeys` : ""}
 
-${TESTING_REQUIREMENTS.includes("TDD") || TESTING_REQUIREMENTS == "All" ?
+${TESTING_REQUIREMENTS.includes("TDD") || TESTING_REQUIREMENTS == "All" ? 
 `### Test-Driven Development
 - Follow TDD patterns evident in the codebase
 - Match the progression of test cases seen in existing code
 - Apply the same refactoring patterns after tests pass` : ""}
 
-${TESTING_REQUIREMENTS.includes("BDD") || TESTING_REQUIREMENTS == "All" ?
+${TESTING_REQUIREMENTS.includes("BDD") || TESTING_REQUIREMENTS == "All" ? 
 `### Behavior-Driven Development
 - Match the existing Given-When-Then structure in tests
 - Follow the same patterns for behavior descriptions
@@ -219,17 +217,17 @@ ${PROJECT_TYPE == "Python" || PROJECT_TYPE == "Auto-detect" || PROJECT_TYPE == "
 
 ## Version Control Guidelines
 
-${VERSIONING == "Semantic" ?
+${VERSIONING == "Semantic" ? 
 `- Follow Semantic Versioning patterns as applied in the codebase
 - Match existing patterns for documenting breaking changes
 - Follow the same approach for deprecation notices` : ""}
 
-${VERSIONING == "CalVer" ?
+${VERSIONING == "CalVer" ? 
 `- Follow Calendar Versioning patterns as applied in the codebase
 - Match existing patterns for documenting changes
 - Follow the same approach for highlighting significant changes` : ""}
 
-${VERSIONING == "Custom" ?
+${VERSIONING == "Custom" ? 
 `- Match the exact versioning pattern observed in the codebase
 - Follow the same changelog format used in existing documentation
 - Apply the same tagging conventions used in the project` : ""}
@@ -280,7 +278,6 @@ To create the copilot-instructions.md file, first analyze the codebase to:
 ### 3. Implementation Notes
 
 The final copilot-instructions.md should:
-
 - Be placed in the .github/copilot directory
 - Reference only patterns and standards that exist in the codebase
 - Include explicit version compatibility requirements

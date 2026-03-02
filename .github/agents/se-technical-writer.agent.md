@@ -117,6 +117,75 @@ Key documentation areas:
 - [ADRs, other architecture docs]
 ```
 
+### Tutorials
+```markdown
+# Learn [Skill] by Building [Project]
+
+## What We're Building
+[Visual/description of end result]
+[Skills you'll learn]
+[Prerequisites]
+
+## Step 1: [First Tangible Progress]
+[Why this step matters]
+[Code/commands]
+[Verify it works]
+
+## Step 2: [Build on Previous]
+[Connect to previous step]
+[New concept introduction]
+[Hands-on exercise]
+
+[Continue steps...]
+
+## Going Further
+[Variations to try]
+[Additional challenges]
+[Related topics to explore]
+```
+
+### Architecture Decision Records (ADRs)
+Follow the [Michael Nygard ADR format](https://github.com/joelparkerhenderson/architecture-decision-record):
+
+```markdown
+# ADR-[Number]: [Short Title of Decision]
+
+**Status**: Proposed | Accepted | Deprecated | Superseded
+**Date**: YYYY-MM-DD
+**Deciders**: [List key people involved]
+
+## Context
+[What forces are at play? Technical, organizational, political? What needs must be met?]
+
+## Decision
+[What's the change we're proposing/have agreed to?]
+
+## Consequences
+**Positive:**
+- [What becomes easier or better?]
+
+**Negative:**
+- [What becomes harder or worse?]
+- [What tradeoffs are we accepting?]
+
+**Neutral:**
+- [What changes but is neither better nor worse?]
+
+## Alternatives Considered
+**Option 1**: [Brief description]
+- Pros: [Why this could work]
+- Cons: [Why we didn't choose it]
+
+## References
+- [Links to related docs, RFCs, benchmarks]
+```
+
+**ADR Best Practices:**
+- One decision per ADR - keep focused
+- Immutable once accepted - new context = new ADR
+- Include metrics/data that informed the decision
+- Reference: [ADR GitHub organization](https://adr.github.io/)
+
 ## Writing Process
 
 1. **Understand** — Read related templates and existing docs for context
@@ -125,6 +194,26 @@ Key documentation areas:
 4. **Link** — Add navigation links to related docs (peer nav + parent README)
 5. **Update README** — If the docs area has changed, update `README.md` Docs table
 
+## Common Pitfalls to Avoid
+
+### Content Issues
+- Starting with implementation before explaining the problem
+- Assuming too much prior knowledge
+- Missing the "so what?" - failing to explain implications
+- Overwhelming with options instead of recommending best practices
+
+### Technical Issues
+- Untested code examples
+- Outdated version references
+- Platform-specific assumptions without noting them
+- Security vulnerabilities in example code
+
+### Writing Issues
+- Passive voice overuse making content feel distant
+- Jargon without definitions
+- Walls of text without visual breaks
+- Inconsistent terminology
+
 ## Quality Checklist
 
 - [ ] All file paths referenced in the document exist
@@ -132,4 +221,6 @@ Key documentation areas:
 - [ ] Headers use Title Case for L1-L2, sentence case for L3+
 - [ ] Code blocks include language identifiers
 - [ ] Navigation links included (related docs + back to README)
+- [ ] Engagement: Would you want to read this?
+- [ ] Accessibility: Readable for non-native English speakers
 - [ ] No placeholder text (TODO, TBD, TKTK) left in final version

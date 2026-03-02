@@ -1,7 +1,5 @@
 ---
-agent: 'agent'
 description: 'Create time-boxed technical spike documents for researching and resolving critical development decisions before implementation.'
-tools: ['runCommands', 'runTasks', 'edit', 'search', 'extensions', 'usages', 'vscodeAPI', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'web/fetch', 'todos']
 ---
 
 # Create Technical Spike Document

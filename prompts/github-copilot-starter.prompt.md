@@ -1,7 +1,4 @@
 ---
-agent: 'agent'
-model: Claude Sonnet 4
-tools: ['edit', 'githubRepo', 'changes', 'problems', 'search', 'runCommands', 'web/fetch']
 description: 'Set up complete GitHub Copilot configuration for a new project based on technology stack'
 ---
 
@@ -211,9 +208,6 @@ Apply the [general coding guidelines](./general-coding.instructions.md) to all c
 **Prompts (.prompt.md):**
 ```yaml
 ---
-agent: 'agent'
-model: Claude Sonnet 4
-tools: ['githubRepo', 'codebase']
 description: 'Generate a new React form component'
 ---
 Your goal is to generate a new React form component based on the templates in #githubRepo contoso/react-templates.
@@ -237,8 +231,6 @@ Requirements for the form:
 ```yaml
 ---
 description: Generate an implementation plan for new features or refactoring existing code.
-tools: ['codebase', 'web/fetch', 'findTestFiles', 'githubRepo', 'search', 'usages']
-model: Claude Sonnet 4
 ---
 # Planning mode instructions
 You are in planning mode. Your task is to generate an implementation plan for a new feature or for refactoring existing code.
