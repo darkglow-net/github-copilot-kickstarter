@@ -478,8 +478,8 @@ $sb = [System.Text.StringBuilder]::new()
 # Health verdict
 $totalErrors   = ($clusterLogStats | ForEach-Object { $_.Stats.ErrorCount }  | Measure-Object -Sum).Sum
 $totalWarnings = ($clusterLogStats | ForEach-Object { $_.Stats.WarningCount } | Measure-Object -Sum).Sum
-$evtxCriticalTotal = ($evtxSummaries | Measure-Object -Property CriticalCount -Sum).Sum
-$evtxErrorTotal    = ($evtxSummaries | Measure-Object -Property ErrorCount    -Sum).Sum
+$evtxCriticalTotal = ($evtxSummaries | ForEach-Object { $_.CriticalCount } | Measure-Object -Sum).Sum
+$evtxErrorTotal    = ($evtxSummaries | ForEach-Object { $_.ErrorCount }    | Measure-Object -Sum).Sum
 # Coerce null (no files of that type) to 0 for safe comparisons
 $totalErrors       = [int]$totalErrors
 $totalWarnings     = [int]$totalWarnings
@@ -716,3 +716,4 @@ Write-Host "Summary created: $summaryPath" -ForegroundColor Green
 Write-Host "Summary size: {0:N1} KB" -f ((Get-Item -LiteralPath $summaryPath).Length / 1KB) -ForegroundColor Green
 
 #endregion
+
