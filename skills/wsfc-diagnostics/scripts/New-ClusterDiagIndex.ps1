@@ -258,11 +258,10 @@ function Get-EvtxSummary {
     }
 
     try {
-        $events = Get-WinEvent -FilterHashtable @{
-            Path         = $FilePath
-            ProviderName = 'Microsoft-Windows-FailoverClustering'
-            Level        = 1, 2   # Critical, Error
-        } -MaxEvents $MaxEvents -ErrorAction Stop
+        # FilterXPath queries the .evtx file directly — unlike FilterHashtable with
+        # ProviderName, it does NOT require the provider to be registered locally.
+        $xpath = "*[System[Provider[@Name='Microsoft-Windows-FailoverClustering'] and (Level=1 or Level=2)]]"
+        $events = Get-WinEvent -Path $FilePath -FilterXPath $xpath -MaxEvents $MaxEvents -ErrorAction Stop
 
         $summary.EventCount    = $events.Count
         $summary.CriticalCount = ($events | Where-Object Level -eq 1).Count
@@ -713,7 +712,7 @@ $sb.ToString() | Set-Content -LiteralPath $summaryPath -Encoding utf8
 
 Write-Host "`nIndex created: $indexPath" -ForegroundColor Green
 Write-Host "Summary created: $summaryPath" -ForegroundColor Green
-Write-Host "Summary size: {0:N1} KB" -f ((Get-Item -LiteralPath $summaryPath).Length / 1KB) -ForegroundColor Green
+Write-Host $("Summary size: {0:N1} KB" -f ((Get-Item -LiteralPath $summaryPath).Length / 1KB)) -ForegroundColor Green
 
 #endregion
 
