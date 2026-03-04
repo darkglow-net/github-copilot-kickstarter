@@ -102,39 +102,35 @@ Select-String -Pattern '<YYYY/MM/DD-HH:M>' -Path *_cluster.log
 
 `.evtx` files are binary event logs exported by `Get-ClusterDiagnosticInfo`. They cannot be read as text — use `Get-WinEvent` (Windows-only, `Microsoft.PowerShell.Diagnostics` module) in the terminal.
 
-> **Important**: Use `-FilterXPath` (not `FilterHashtable` with `ProviderName`) for exported `.evtx` files. `FilterHashtable` validates provider names against the **local** machine's registry, which fails if FailoverClustering isn't installed on your analysis workstation.
-
 ### Quick Queries
 
 ```powershell
 # All FailoverClustering critical/error events from an exported .evtx
-# Uses -FilterXPath so the provider doesn't need to be registered locally
-Get-WinEvent -Path '*_SystemEventLog.evtx' -FilterXPath @"
-*[System[Provider[@Name='Microsoft-Windows-FailoverClustering']
-  and (Level=1 or Level=2)]]
-"@ -MaxEvents 50 -ErrorAction SilentlyContinue |
+Get-WinEvent -FilterHashtable @{
+    Path         = '*_SystemEventLog.evtx'
+    ProviderName = 'Microsoft-Windows-FailoverClustering'
+    Level        = 1, 2
+} -MaxEvents 50 -ErrorAction SilentlyContinue |
     Select-Object TimeCreated, Id, LevelDisplayName, Message
 
 # Specific event IDs (node eviction, resource failure, quorum loss)
-Get-WinEvent -Path '*_SystemEventLog.evtx' -FilterXPath @"
-*[System[(EventID=1135 or EventID=1069 or EventID=1177 or EventID=1000 or EventID=1006)]]
-"@ -ErrorAction SilentlyContinue |
+Get-WinEvent -FilterHashtable @{
+    Path = '*_SystemEventLog.evtx'
+    Id   = 1135, 1069, 1177, 1000, 1006
+} -ErrorAction SilentlyContinue |
     Select-Object TimeCreated, Id, LevelDisplayName, Message
 ```
 
 ### Time-Window Filtering
 
 ```powershell
-# Events within a known incident window — use FilterHashtable for time ranges
-# (StartTime/EndTime are not supported in XPath). Omit ProviderName to avoid
-# local registry validation; filter by provider in a Where-Object instead.
+# Events within a known incident window
 Get-WinEvent -FilterHashtable @{
     Path      = '*_SystemEventLog.evtx'
     Level     = 1, 2
     StartTime = [datetime]'2024-01-15 14:00:00'
     EndTime   = [datetime]'2024-01-15 16:00:00'
-} -ErrorAction SilentlyContinue |
-    Where-Object ProviderName -eq 'Microsoft-Windows-FailoverClustering'
+} -ErrorAction SilentlyContinue
 ```
 
 ### XPath Filtering

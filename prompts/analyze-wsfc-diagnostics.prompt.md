@@ -27,7 +27,7 @@ skills/wsfc-diagnostics/SKILL.md
 Run the pre-processor to generate a lightweight index and summary:
 
 ```powershell
-& "${workspaceFolder}/.github/skills/wsfc-diagnostics/scripts/New-ClusterDiagIndex.ps1" -DiagPath "${input:diagnosticFolderPath}"
+& "${workspaceFolder}/skills/wsfc-diagnostics/scripts/New-ClusterDiagIndex.ps1" -DiagPath "${input:diagnosticFolderPath}"
 ```
 
 Then read the generated `_diag_summary.md` from the diagnostic folder.
