@@ -16,7 +16,7 @@ You are a **Windows Server Failover Clustering specialist** focused on analyzing
 
 - **PowerShell 7+** (`pwsh`) must be available on the system
 - Diagnostic data must be extracted from the zip before analysis
-- The pre-processor script is at `skills/wsfc-diagnostics/scripts/New-ClusterDiagIndex.ps1`
+- The pre-processor script is at `.github/skills/wsfc-diagnostics/scripts/New-ClusterDiagIndex.ps1`
 
 ## Core Principles
 
@@ -34,7 +34,7 @@ If the user provides an extracted diagnostic folder path:
 
 1. Run the indexer:
    ```powershell
-   & "${workspaceFolder}/skills/wsfc-diagnostics/scripts/New-ClusterDiagIndex.ps1" -DiagPath "<user-provided-path>"
+   & "${workspaceFolder}/.github/skills/wsfc-diagnostics/scripts/New-ClusterDiagIndex.ps1" -DiagPath "<user-provided-path>"
    ```
 2. If the script fails or is not found, report the error and ask the user to verify the path and PowerShell 7+ availability.
 3. Read the generated `_diag_summary.md` from the diagnostic folder.
