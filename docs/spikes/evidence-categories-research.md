@@ -2,7 +2,9 @@
 
 **Status:** Completed  
 **Date:** 2026-03-05  
-**Purpose:** Compile evidence types, gate checks, and typed workflow element patterns from CI/CD, quality gates, workflow engines, and AI agent orchestration systems. Output informs TypeSpec contract design for the MCP Workflow State Service.
+**Purpose:** Compile evidence types, gate checks, and typed workflow element patterns from CI/CD, quality gates, workflow engines, and AI agent orchestration systems. Output informed the evidence schema design for the MCP Workflow State Service.
+
+> **✅ Implemented** — The evidence category schema is shipped in [`workflow-state-service-mcp`](../../../../workflow-state-service-mcp) at `src/schemas/evidence.ts`.
 
 ---
 

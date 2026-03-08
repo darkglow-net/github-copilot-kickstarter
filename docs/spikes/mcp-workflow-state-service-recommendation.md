@@ -1,5 +1,7 @@
 # Comprehensive Recommendation: MCP‑Backed Workflow State Service (Shared DB) for VS Code Copilot Agent Mode
 
+> **✅ Implemented** — This recommendation was fully implemented. The standalone project lives at [`workflow-state-service-mcp`](../../../../workflow-state-service-mcp) (307/307 tests passing).
+
 **Context:** Multi‑phase, spec‑driven workflow in **GitHub Copilot Chat (Agent mode) in VS Code**, using **markdown prompts + instruction files + skills**, and delegating to fresh‑context subagents; tools are a first‑class mechanism in agent mode.
 **Decision:** Use a **single shared local database** behind a **local MCP server** as the only interface for workflow state + event receipts. Export a final snapshot back into the spec folder at closeout.
 
