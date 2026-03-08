@@ -6,10 +6,7 @@ Lightweight records capturing the *why* behind significant decisions in the work
 
 | ADR | Status | Summary |
 |-----|--------|---------|
-| [0001](0001-workon-prompt-rewrite-phase-loss-mitigation.md) | Accepted | Workon prompt rewrite — phase loss mitigation via persistent tracking, review caps, expanded later phases |
-
-## Template
-
+| 0001 | Accepted | Workon prompt rewrite — phase loss mitigation *(migrated to [workflow-state-service-mcp](../../../../workflow-state-service-mcp/docs/adr/0001-workon-prompt-rewrite-phase-loss-mitigation.md))* |
 Each ADR follows this structure:
 
 1. **Title** — Short descriptive name

@@ -6,8 +6,8 @@ Notes, experiments, and refined techniques for writing effective Copilot prompts
 
 | Topic | Description |
 |-------|-------------|
-| [Workon Orchestrator Research Spike](workon-orchestrator-research-spike.md) | Exhaustive survey of AI orchestrator patterns, spec-driven frameworks (Spec Kit, BMAD, Kiro), context persistence strategies, and anti-patterns for improving workon prompts |
-| [Workon Phase Loss](workon-phase-loss-lessons-learned.md) | How `manage_todo_list` full-replacement semantics cause phase loss in multi-phase workflows, and mitigation strategies |
+| [Workon Orchestrator Research Spike](../../../../workflow-state-service-mcp/docs/prompt-craft/workon-orchestrator-research-spike.md) | Moved to workflow-state-service-mcp — exhaustive survey of AI orchestrator patterns that motivated WSS |
+| [Workon Phase Loss](../../../../workflow-state-service-mcp/docs/prompt-craft/workon-phase-loss-lessons-learned.md) | Moved to workflow-state-service-mcp — phase loss analysis that led to WSS being built |
 | Prompt patterns | Zero-shot, few-shot, chain-of-thought, role prompting |
 | Agent design | What makes an effective agent persona |
 | Instruction tuning | Writing instructions that Copilot follows reliably |
