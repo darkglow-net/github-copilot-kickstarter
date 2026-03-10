@@ -74,14 +74,16 @@ These are the home-grown workflow prompts that drive day-to-day development:
 | Prompt | Invoke | What it does |
 |--------|--------|--------------|
 | **workon.myidea** | `/workon.myidea` | Structured workflow for bug fixes, small features, and refactors. Routes large work to `workon.myspec`. |
+| **workon.myideav2** | `/workon.myideav2` | MCP-backed lightweight workflow using Workflow State Service for persistent state management. |
 | **workon.myspec** | `/workon.myspec` | Coordinator for spec-driven feature development. Depends on [SpecKit](https://github.com/github/spec-kit) agents and templates. |
+| **workon.myspecv2** | `/workon.myspecv2` | MCP-backed spec-driven coordinator using Workflow State Service for persistent state management. |
 | **validate.myprompt** | `/validate.myprompt` | Dispatches three parallel specialist reviews ([critical-thinking](agents/critical-thinking.agent.md), [code-review](agents/code-review.agent.md), [prompt-builder](agents/prompt-builder.agent.md)) of a workspace template file (`.prompt.md`, `.agent.md`, `.instructions.md`, `SKILL.md`), then synthesizes a prioritized action plan. |
 
 ---
 
 ## Catalog
 
-### Agents (14)
+### Agents (16)
 
 Specialized AI personas invoked via `@agent-name` in Copilot Chat.
 
@@ -101,15 +103,19 @@ Specialized AI personas invoked via `@agent-name` in Copilot Chat.
 | [tdd-red](agents/tdd-red.agent.md) | Write failing tests first from GitHub issue context | [🔗](https://github.com/github/awesome-copilot/blob/main/agents/tdd-red.agent.md) |
 | [tdd-green](agents/tdd-green.agent.md) | Implement minimal code to make failing tests pass | [🔗](https://github.com/github/awesome-copilot/blob/main/agents/tdd-green.agent.md) |
 | [tdd-refactor](agents/tdd-refactor.agent.md) | Improve quality and security while keeping tests green | [🔗](https://github.com/github/awesome-copilot/blob/main/agents/tdd-refactor.agent.md) |
+| [workon.myideav2](agents/workon.myideav2.agent.md) | Orchestrates lightweight development workflow using MCP workflow state | [🏠](agents/workon.myideav2.agent.md) |
+| [workon.myspecv2](agents/workon.myspecv2.agent.md) | Orchestrates spec-driven development workflow using MCP workflow state | [🏠](agents/workon.myspecv2.agent.md) |
 
-### Prompts (15)
+### Prompts (17)
 
 Workflow starters invoked via `/prompt-name` in Copilot Chat.
 
 | Prompt | Description | Source |
 |--------|-------------|--------|
 | [workon.myidea](prompts/workon.myidea.prompt.md) | Structured workflow for bug fixes, small features, and refactors | [🏠](prompts/workon.myidea.prompt.md) |
+| [workon.myideav2](prompts/workon.myideav2.prompt.md) | MCP-backed lightweight workflow using Workflow State Service | [🏠](prompts/workon.myideav2.prompt.md) |
 | [workon.myspec](prompts/workon.myspec.prompt.md) | Coordinator for spec-driven feature development. Depends on [SpecKit](https://github.com/github/spec-kit). | [🏠](prompts/workon.myspec.prompt.md) |
+| [workon.myspecv2](prompts/workon.myspecv2.prompt.md) | MCP-backed spec-driven coordinator using Workflow State Service | [🏠](prompts/workon.myspecv2.prompt.md) |
 | [validate.myprompt](prompts/validate.myprompt.prompt.md) | Parallel specialist review of a workspace template file with synthesized action plan | [🏠](prompts/validate.myprompt.prompt.md) |
 | [architecture-blueprint-generator](prompts/architecture-blueprint-generator.prompt.md) | Analyzes codebases to create detailed architectural documentation | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/architecture-blueprint-generator/SKILL.md) |
 | [copilot-instructions-blueprint-generator](prompts/copilot-instructions-blueprint-generator.prompt.md) | Scaffolds a copilot-instructions.md tailored to your tech stack | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/copilot-instructions-blueprint-generator/SKILL.md) |
