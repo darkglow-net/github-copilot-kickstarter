@@ -1,4 +1,5 @@
 ---
+name: playwright-generate-test
 description: 'Generate a Playwright test based on a scenario using Playwright MCP'
 ---
 

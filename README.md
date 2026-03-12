@@ -10,7 +10,7 @@ A curated library of reusable GitHub Copilot markdown files — **instructions**
 
 ```
 1.  Open this workspace alongside your target project
-2.  Run  /copilot-instructions-blueprint-generator   to scaffold a copilot-instructions.md
+2.  Ask Copilot to scaffold a copilot-instructions.md (the copilot-instructions-blueprint-generator skill activates automatically)
 3.  Cherry-pick instructions, agents, prompts, and skills you need
 4.  Customize freely — downstream divergence is expected
 ```
@@ -102,7 +102,7 @@ Specialized AI personas invoked via `@agent-name` in Copilot Chat.
 | [tdd-green](agents/tdd-green.agent.md) | Implement minimal code to make failing tests pass | [🔗](https://github.com/github/awesome-copilot/blob/main/agents/tdd-green.agent.md) |
 | [tdd-refactor](agents/tdd-refactor.agent.md) | Improve quality and security while keeping tests green | [🔗](https://github.com/github/awesome-copilot/blob/main/agents/tdd-refactor.agent.md) |
 
-### Prompts (15)
+### Prompts (3)
 
 Workflow starters invoked via `/prompt-name` in Copilot Chat.
 
@@ -111,18 +111,6 @@ Workflow starters invoked via `/prompt-name` in Copilot Chat.
 | [workon.myidea](prompts/workon.myidea.prompt.md) | Structured workflow for bug fixes, small features, and refactors | [🏠](prompts/workon.myidea.prompt.md) |
 | [workon.myspec](prompts/workon.myspec.prompt.md) | Coordinator for spec-driven feature development. Depends on [SpecKit](https://github.com/github/spec-kit). | [🏠](prompts/workon.myspec.prompt.md) |
 | [validate.myprompt](prompts/validate.myprompt.prompt.md) | Parallel specialist review of a workspace template file with synthesized action plan | [🏠](prompts/validate.myprompt.prompt.md) |
-| [architecture-blueprint-generator](prompts/architecture-blueprint-generator.prompt.md) | Analyzes codebases to create detailed architectural documentation | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/architecture-blueprint-generator/SKILL.md) |
-| [copilot-instructions-blueprint-generator](prompts/copilot-instructions-blueprint-generator.prompt.md) | Scaffolds a copilot-instructions.md tailored to your tech stack | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/copilot-instructions-blueprint-generator/SKILL.md) |
-| [create-agentsmd](prompts/create-agentsmd.prompt.md) | Generates an AGENTS.md file for a repository | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/create-agentsmd/SKILL.md) |
-| [create-technical-spike](prompts/create-technical-spike.prompt.md) | Creates time-boxed spike documents for critical technical decisions | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/create-technical-spike/SKILL.md) |
-| [documentation-writer](prompts/documentation-writer.prompt.md) | Diátaxis expert for creating structured technical documentation | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/documentation-writer/SKILL.md) |
-| [github-copilot-starter](prompts/github-copilot-starter.prompt.md) | Sets up complete GitHub Copilot configuration for a new project | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/github-copilot-starter/SKILL.md) |
-| [multi-stage-dockerfile](prompts/multi-stage-dockerfile.prompt.md) | Creates optimized multi-stage Dockerfiles for any language | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/multi-stage-dockerfile/SKILL.md) |
-| [playwright-generate-test](prompts/playwright-generate-test.prompt.md) | Generates Playwright tests from scenarios using Playwright MCP | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/playwright-generate-test/SKILL.md) |
-| [pytest-coverage](prompts/pytest-coverage.prompt.md) | Runs pytest with coverage analysis and drives toward 100% | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/pytest-coverage/SKILL.md) |
-| [python-mcp-server-generator](prompts/python-mcp-server-generator.prompt.md) | Scaffolds a complete MCP server project in Python | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/python-mcp-server-generator/SKILL.md) |
-| [technology-stack-blueprint-generator](prompts/technology-stack-blueprint-generator.prompt.md) | Detects and documents technology stacks with version info and diagrams | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/technology-stack-blueprint-generator/SKILL.md) |
-| [typescript-mcp-server-generator](prompts/typescript-mcp-server-generator.prompt.md) | Scaffolds a complete MCP server project in TypeScript | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/typescript-mcp-server-generator/SKILL.md) |
 
 ### Instructions (30)
 
@@ -161,22 +149,34 @@ Coding standards Copilot auto-loads based on `applyTo` glob patterns.
 | [update-docs-on-code-change](instructions/update-docs-on-code-change.instructions.md) | code + docs globs | Auto-update docs when code changes | [🔗](https://github.com/github/awesome-copilot/blob/main/instructions/update-docs-on-code-change.instructions.md) |
 | [versioning-management](instructions/versioning-management.instructions.md) | `**/package.json` etc. | SemVer and release automation rules | [🏠](instructions/versioning-management.instructions.md) |
 
-### Skills (11)
+### Skills (23)
 
 Domain knowledge packages with embedded scripts, references, or assets.
 
 | Skill | Description | Source |
 |-------|-------------|--------|
 | [agentic-eval](skills/agentic-eval/SKILL.md) | Evaluator-optimizer pipelines, self-critique loops, LLM-as-judge | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/agentic-eval/SKILL.md) |
+| [architecture-blueprint-generator](skills/architecture-blueprint-generator/SKILL.md) | Analyzes codebases to create detailed architectural documentation | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/architecture-blueprint-generator/SKILL.md) |
 | [chrome-devtools](skills/chrome-devtools/SKILL.md) | Browser automation, debugging, and performance via Chrome DevTools MCP | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/chrome-devtools/SKILL.md) |
+| [copilot-instructions-blueprint-generator](skills/copilot-instructions-blueprint-generator/SKILL.md) | Scaffolds a copilot-instructions.md tailored to your tech stack | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/copilot-instructions-blueprint-generator/SKILL.md) |
 | [copilot-sdk](skills/copilot-sdk/SKILL.md) | Build agentic apps with GitHub Copilot SDK, MCP servers, custom agents | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/copilot-sdk/SKILL.md) |
+| [create-agentsmd](skills/create-agentsmd/SKILL.md) | Generates an AGENTS.md file for a repository | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/create-agentsmd/SKILL.md) |
+| [create-technical-spike](skills/create-technical-spike/SKILL.md) | Creates time-boxed spike documents for critical technical decisions | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/create-technical-spike/SKILL.md) |
+| [documentation-writer](skills/documentation-writer/SKILL.md) | Diátaxis expert for creating structured technical documentation | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/documentation-writer/SKILL.md) |
+| [github-copilot-starter](skills/github-copilot-starter/SKILL.md) | Sets up complete GitHub Copilot configuration for a new project | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/github-copilot-starter/SKILL.md) |
 | [make-skill-template](skills/make-skill-template/SKILL.md) | Scaffold new SKILL.md files with proper structure | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/make-skill-template/SKILL.md) |
 | [mcp-cli](skills/mcp-cli/SKILL.md) | Interface with MCP servers from the command line | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/mcp-cli/SKILL.md) |
 | [microsoft-code-reference](skills/microsoft-code-reference/SKILL.md) | Look up Microsoft API references and verify SDK code | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/microsoft-code-reference/SKILL.md) |
 | [microsoft-skill-creator](skills/microsoft-skill-creator/SKILL.md) | Create agent skills for any Microsoft technology via Learn MCP | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/microsoft-skill-creator/SKILL.md) |
+| [multi-stage-dockerfile](skills/multi-stage-dockerfile/SKILL.md) | Creates optimized multi-stage Dockerfiles for any language | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/multi-stage-dockerfile/SKILL.md) |
+| [playwright-generate-test](skills/playwright-generate-test/SKILL.md) | Generates Playwright tests from scenarios using Playwright MCP | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/playwright-generate-test/SKILL.md) |
 | [powershell-7](skills/powershell-7/SKILL.md) | PowerShell 7 best practices, performance, cross-platform, Pester | [🏠](skills/powershell-7/SKILL.md) |
 | [prd](skills/prd/SKILL.md) | Generate Product Requirements Documents with user stories and risk analysis | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/prd/SKILL.md) |
+| [pytest-coverage](skills/pytest-coverage/SKILL.md) | Runs pytest with coverage analysis and drives toward 100% | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/pytest-coverage/SKILL.md) |
+| [python-mcp-server-generator](skills/python-mcp-server-generator/SKILL.md) | Scaffolds a complete MCP server project in Python | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/python-mcp-server-generator/SKILL.md) |
 | [refactor](skills/refactor/SKILL.md) | Surgical code refactoring — extract, rename, decompose, improve types | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/refactor/SKILL.md) |
+| [technology-stack-blueprint-generator](skills/technology-stack-blueprint-generator/SKILL.md) | Detects and documents technology stacks with version info and diagrams | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/technology-stack-blueprint-generator/SKILL.md) |
+| [typescript-mcp-server-generator](skills/typescript-mcp-server-generator/SKILL.md) | Scaffolds a complete MCP server project in TypeScript | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/typescript-mcp-server-generator/SKILL.md) |
 | [webapp-testing](skills/webapp-testing/SKILL.md) | Test local web apps with Playwright — screenshots, logs, UI verification | [🔗](https://github.com/github/awesome-copilot/blob/main/skills/webapp-testing/SKILL.md) |
 
 ---

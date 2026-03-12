@@ -121,6 +121,7 @@ my-awesome-skill/
    - Write a keyword-rich `description:`
    - Replace body content with your instructions
 4. Add bundled resources as needed
+5. Validate with `npm run skill:validate`
 
 ## Validation Checklist
 
