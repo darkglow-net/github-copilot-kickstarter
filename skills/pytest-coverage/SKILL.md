@@ -1,4 +1,5 @@
 ---
+name: pytest-coverage
 description: 'Run pytest tests with coverage, discover lines missing coverage, and increase coverage to 100%.'
 ---
 
