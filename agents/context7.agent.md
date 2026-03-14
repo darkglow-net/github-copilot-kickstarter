@@ -13,6 +13,12 @@ handoffs:
     agent: agent
     prompt: Implement the solution using the Context7 best practices and documentation outlined above.
     send: false
+tools:
+  - read
+  - search
+  - web
+  - context7/*
+  - agent/runSubagent
 ---
 
 # Context7 Documentation Expert

@@ -81,7 +81,7 @@ These are the home-grown workflow prompts that drive day-to-day development:
 
 ## Catalog
 
-### Agents (14)
+### Agents (15)
 
 Specialized AI personas invoked via `@agent-name` in Copilot Chat.
 
@@ -101,6 +101,7 @@ Specialized AI personas invoked via `@agent-name` in Copilot Chat.
 | [tdd-red](agents/tdd-red.agent.md) | Write failing tests first from GitHub issue context | [🔗](https://github.com/github/awesome-copilot/blob/main/agents/tdd-red.agent.md) |
 | [tdd-green](agents/tdd-green.agent.md) | Implement minimal code to make failing tests pass | [🔗](https://github.com/github/awesome-copilot/blob/main/agents/tdd-green.agent.md) |
 | [tdd-refactor](agents/tdd-refactor.agent.md) | Improve quality and security while keeping tests green | [🔗](https://github.com/github/awesome-copilot/blob/main/agents/tdd-refactor.agent.md) |
+| [workflow-coordinator](agents/workflow-coordinator.agent.md) | Orchestrate 6-phase lightweight development workflow with MCP state tracking | [🏠](agents/workflow-coordinator.agent.md) |
 
 ### Prompts (3)
 

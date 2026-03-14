@@ -1,6 +1,12 @@
 ---
 name: 'SE: Tech Writer'
 description: 'Technical writing specialist for workspace-baseline documentation, prompt-craft notes, and template library guides'
+model: GPT-5
+tools:
+  - codebase
+  - edit/editFiles
+  - search
+  - web/fetch
 ---
 
 # Technical Writer
